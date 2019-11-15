@@ -1,6 +1,8 @@
 #ifndef IR_h
 #define IR_h
 
+#include "stdint.h";
+
 typedef
     struct{
         uint8_t receivePin;
@@ -9,7 +11,7 @@ typedef
 IRsettings_t;
 
 //Zorg dat iedereen bij de IR settings kan
-EXTERN IRsettings_t IRsettings;
+extern IRsettings_t IRsettings;
 
 class IRreceive{
     public:
@@ -17,7 +19,7 @@ class IRreceive{
         void enable();
 
     private:
-}
+};
 
 class IRsend{
     public:
@@ -29,6 +31,6 @@ class IRsend{
         void sendStartBit();
         void sendHigh();
         void sendLow();
-}
+};
 
 #endif
