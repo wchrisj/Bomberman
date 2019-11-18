@@ -5,7 +5,7 @@
  * Author : Simon Brolsma S1131109
  */
 #include <Wire.h>
-#include "nunchuk_data.h"
+#include "nunchuk.h"
 #define NUNCHUK_ADDR 0x52
 
 //0 = Horizontal
@@ -15,12 +15,10 @@
 //4 = Gyro
 //5 = {3: Released}, {2: Z}, {1: C}, {0: Z+C}
 uint8_t nunchuk_data[6];
-input status;
-
-void processNunchukData();
+NunchukInput::input status;
 
 //Waardes van de Nunchuk opvragen
-void nunchuk_get() {
+void NunchukInput::nunchuk_get() {
 	Wire.beginTransmission(NUNCHUK_ADDR);
 	//6 bytes opvragen van de nunchuk
 	Wire.requestFrom(NUNCHUK_ADDR, 6);
@@ -34,7 +32,7 @@ void nunchuk_get() {
 }
 
 //Opgevraagde data verwerken voor een betere leesbaarheid
-void processNunchukData() {
+void NunchukInput::processNunchukData() {
 	//Neutrale X positie
 	if (nunchuk_data[0] == 128) {
 		status.RIGHT = 0;
