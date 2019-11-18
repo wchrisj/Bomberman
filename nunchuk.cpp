@@ -23,12 +23,14 @@ void NunchukInput::nunchuk_get() {
 	//6 bytes opvragen van de nunchuk
 	Wire.requestFrom(NUNCHUK_ADDR, 6);
 	//Data opslaan
-	for (uint8_t i = 0; i < 6 && Wire.available(); i++) {
-		nunchuk_data[i] = Wire.read();
+	if (Wire.available()) {
+		for (uint8_t i = 0; i < 6 && Wire.available(); i++) {
+			nunchuk_data[i] = Wire.read();
+		}
+		Wire.write(0x00);
+		Wire.endTransmission(true);
+		processNunchukData();
 	}
-	Wire.write(0x00);
-	Wire.endTransmission(true);
-	processNunchukData();
 }
 
 //Opgevraagde data verwerken voor een betere leesbaarheid
