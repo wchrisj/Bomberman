@@ -1,7 +1,7 @@
 #ifndef IR_h
 #define IR_h
 
-#include "stdint.h";
+#include "stdint.h"
 
 typedef
     struct{
@@ -24,13 +24,16 @@ class IRreceive{
 class IRsend{
     public:
         IRsend(uint8_t kHz);
-        void send(uint16_t data);
+        void send(uint16_t data, uint8_t len);
+        static const uint8_t test = 0;
 
     private:
         void setupTimer(uint8_t kHz);
         void sendStartBit();
         void sendHigh();
         void sendLow();
+
+        uint8_t khz;
 };
 
 #endif
