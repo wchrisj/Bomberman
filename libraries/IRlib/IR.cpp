@@ -1,79 +1,108 @@
-#include "IR.hpp"
+#include "IR.h"
 
-uint8_t khz;
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
 
 /*
     Constructor
     stelt de zendpin in en stelt de frequent van de timer op deze pin in
 */
-IRsend::IRsend(uint8_t kHz){
-    IRsettings.sendPin = (1 << PIND3); //Zet de zendpin als pin D3, deze hoort bij timer 2
-    IRsend::setupTimer(kHz);
-    IRsend::khz = kHz;
+IR::IR(uint8_t receivePin, uint8_t kHz){
+    //Maak sender en receiver aan
+    //Vul IRsettings
+
+    IRsettings.sendPin = receivePin;
+
+    IR::IRsettings.sendPin = (1 << PIND3); //Zet de zendpin als pin D3, deze hoort bij timer 2
+    IR::setupSendTimer(kHz);
+    IR::khz = kHz;
 }
 
-void IRsend::setupTimer(uint8_t kHz){
+void IR::enableReceiver(){
+
+}
+
+void IR::setupSendTimer(uint8_t kHz){
     //Zet de interrupts tijdelijk uit
     cli();
 
     //Stel de timer in 
     //Fast PWM, top = OCR2A
-    TCCR2A |= (1 << WGM21) | (1 << WGM20);
-    TCCR2B |= (1 << WGM22)
+    TCCR2A |= (1 << WGM20);
+    TCCR2B |= (1 << WGM22);
+    TCCR2B |= (1 << CS20); //Geen prescaling
 
-    if(kHz == 38){
-        //Zet prescaler = 8
-        TCCR2B |= (1<<CS21);
+    OCR2A = F_CPU / 2000 / kHz;
+    OCR2B = (F_CPU / 2000 / kHz)/3;
 
-        //Zet OCR2A = 52
-        OCR2A = 52;
-    }else if(kHz == 56){
-        //Zet prescaler = 8
-        TCCR2B |= (1<<CS21);
+    // if(kHz == 38){
+    //     //Zet prescaler = 8
+    //     TCCR2B |= (1<<CS21);
 
-        //Zet OCR2A = 36
-        OCR2A = 36;
-    }
+    //     //Zet OCR2A = 52
+    //     OCR2A = 52;
+    // }else if(kHz == 56){
+    //     //Zet prescaler = 8
+    //     TCCR2B |= (1<<CS21);
+
+    //     //Zet OCR2A = 36
+    //     OCR2A = 36;
+    // }
 
     //Zet de interrupts weer aan
     sei();
 }
 
-void IRsend::send(uint16_t data, uint8_t len){
+void IR::send(uint16_t data, uint8_t len){
     //Zet de timer goed
-    IRsend::setupTimer(IRsend::khz);
+    TIMSK2 = 0;
+    DDRD |= (1 << DDD3);
+    PIND &= ~(1 << DDD3);
+    IR::setupSendTimer(IR::khz);
 
     //Zend start bit
-    IRsend::sendStartBit();
+    IR::sendStartBit();
 
     //Zend data en bereken paritybit
     uint8_t highBits = 0;
     for(uint8_t i = 0; i < len; i++){
         if(data & (1 << i)){
-            IRsend::sendHigh();
+            IR::sendHigh();
             highBits++;
         }else{
-            IRsend::sendLow();
+            IR::sendLow();
         }
     }
 
     //Zend partitybit
     if(highBits & 1){ //Er is een oneven aantal eentjes
-        IRsend::sendHigh();
+        IR::sendHigh();
     }else{
-        IRsend::sendLow();
+        IR::sendLow();
     }
 }
 
-void IRsend::sendStartBit(){
+void IR::sendStartBit(){
+    TCCR2A |= (1 << COM2B1);
+    _delay_us(TIME_START);
 
-    _delay_us(5);
+    TCCR2A &= ~(1 << COM2B1);
+    _delay_us(TIME_LOW);
 }
 
-void IRsend::sendHigh(){
+void IR::sendHigh(){
+    TCCR2A |= (1 << COM2B1);
+    _delay_us(TIME_1);
 
+    TCCR2A &= ~(1 << COM2B1);
+    _delay_us(TIME_LOW);
 }
 
-void IRsend::sendLow(){
+void IR::sendLow(){
+    TCCR2A |= (1 << COM2B1);
+    _delay_us(TIME_0);
 
+    TCCR2A &= ~(1 << COM2B1);
+    _delay_us(TIME_LOW);
 }

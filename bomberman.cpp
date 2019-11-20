@@ -1,17 +1,19 @@
-#include "libraries/IRlib/IR.hpp"
+#include "libraries/IRlib/IR.h"
+
+#include <avr/io.h>
+#include <util/delay.h>
 
 int main(){
     uint8_t khz = 38;
 
-    IRsend::test;
+    IR sender = IR(3, khz);
 
-    IRsend sender = IRsend(khz);
 
-    //IRsend::IRsend sender(khz);
-
-    sender.send(0b00000000, 8);
+    // DDRD |= (1 << DDD3);
+    // PIND |= (1 << DDD3);
     while(1){
-        
+    sender.send(0xFF, 8);
+    _delay_ms(500);
     }
 
     return 0;

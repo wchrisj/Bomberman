@@ -3,6 +3,11 @@
 
 #include "stdint.h"
 
+#define TIME_LOW 600
+#define TIME_0 600
+#define TIME_1 1200
+#define TIME_START 2400
+
 typedef
     struct{
         uint8_t receivePin;
@@ -10,25 +15,16 @@ typedef
     }
 IRsettings_t;
 
-//Zorg dat iedereen bij de IR settings kan
-extern IRsettings_t IRsettings;
-
-class IRreceive{
+class IR{
     public:
-        IRreceive(uint8_t receivePin);
-        void enable();
-
-    private:
-};
-
-class IRsend{
-    public:
-        IRsend(uint8_t kHz);
+        IR(uint8_t receivePin, uint8_t kHz);
         void send(uint16_t data, uint8_t len);
-        static const uint8_t test = 0;
+        void enableReceiver();
+
+        IRsettings_t IRsettings;
 
     private:
-        void setupTimer(uint8_t kHz);
+        void setupSendTimer(uint8_t kHz);
         void sendStartBit();
         void sendHigh();
         void sendLow();
