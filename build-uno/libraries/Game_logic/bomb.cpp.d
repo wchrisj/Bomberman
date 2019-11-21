@@ -1,6 +1,5 @@
-build-uno/./libraries/Game_logic/character.cpp.o: \
- libraries/Game_logic/character.cpp \
- libraries/Game_logic/../../Adafruit_GFX.h \
+build-uno/./libraries/Game_logic/bomb.cpp.o: \
+ libraries/Game_logic/bomb.cpp libraries/Game_logic/../../Adafruit_GFX.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/Arduino.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/binary.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/WCharacter.h \

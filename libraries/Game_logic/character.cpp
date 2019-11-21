@@ -6,6 +6,7 @@
 #include "../../Adafruit_ILI9341.h"	// Hardware-specific library
 
 #include "character.h"
+#include "bomb.h"
 
 void Character::init(int _y, int _x, int _height, int _width, uint16_t _color) {
 	x = _x;
@@ -17,7 +18,7 @@ void Character::init(int _y, int _x, int _height, int _width, uint16_t _color) {
 }
 
 void Character::draw(int y, int x, int height, int width, uint16_t color) {
-	tft.fillRect(bombY, bombX, height, width, ILI9341_RED);
+	tft.fillRect(bomb.bombY, bomb.bombX, height, width, ILI9341_RED);
 	tft.fillRect(y, x, height, width, color);
 }
 
@@ -52,39 +53,32 @@ void Character::move(Direction dir) {
 	}
 }
 
-void Character::placeBomb() {
-	draw(bombY, bombX, height, width, ILI9341_BLACK);
-	bombX = x;
-	bombY = y;
-	draw(y, x, height, width, ILI9341_RED);
-}
-
 bool Character::collision(Direction dir) {
 	if (dir == Character::UP) {
 		//Check Up
-		if ((y + height) != bombY ||
-			x != bombX) {
+		if (((y + height) != bomb.bombY ||
+			x != bomb.bombX) && bomb.exists) {
 			return true;
 		}
 	}
 	else if (dir == Character::RIGHT) {
 		//Check Right
-		if ((x + width) != bombX ||
-			y != bombY) {
+		if ((x + width) != bomb.bombX ||
+			y != bomb.bombY) {
 			return true;
 		}
 	}
 	else if (dir == Character::DOWN) {
 		//Check Down
-		if ((y - height) != bombY ||
-			x != bombX) {
+		if ((y - height) != bomb.bombY ||
+			x != bomb.bombX) {
 			return true;
 		}
 	}
 	else if (dir == Character::LEFT) {
 		//Check Left
-		if ((x - width) != bombX ||
-			y != bombY) {
+		if ((x - width) != bomb.bombX ||
+			y != bomb.bombY) {
 			return true;
 		}
 	}
