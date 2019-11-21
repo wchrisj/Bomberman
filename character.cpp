@@ -2,8 +2,8 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-#include "Adafruit_GFX.h"	// Core graphics library
-#include "Adafruit_ILI9341.h"	// Hardware-specific library
+#include "../../Adafruit_GFX.h"	// Core graphics library
+#include "../../Adafruit_ILI9341.h"	// Hardware-specific library
 
 #include "character.h"
 

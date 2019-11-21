@@ -2,11 +2,11 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-#include "Adafruit_GFX.h"	// Core graphics library
-#include "Adafruit_ILI9341.h"	// Hardware-specific library
+#include "../../Adafruit_GFX.h"	// Core graphics library
+#include "../../Adafruit_ILI9341.h"	// Hardware-specific library
 
-#include "character.h"
-#include "nunchuk.h"
+#include "libraries/Game_logic/character.h"
+#include "libraries/Nunchuk/nunchuk.h"
 
 int main (void)
 {
@@ -18,7 +18,7 @@ int main (void)
 	character.tft.begin();
 	character.tft.fillScreen(ILI9341_BLACK);	
 
-  character.init(0, 0, 16, 16, ILI9341_YELLOW);
+  character.init(0, 0, 20, 20, ILI9341_YELLOW);
 
   while (1)
   {
