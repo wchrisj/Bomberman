@@ -8,7 +8,7 @@ IRsettings_t IRsettings;
 irparams_t irparams;
 /*
     Constructor
-    stelt de zendpin in en stelt de frequent van de timer op deze pin in
+    stelt de zendpin en ontvangpin in en stelt de frequent van de timer op de zendpin in
 */
 IR::IR(uint8_t receivePin, uint8_t kHz){
     //Maak sender en receiver aan
@@ -20,6 +20,9 @@ IR::IR(uint8_t receivePin, uint8_t kHz){
     setupSendTimer(kHz);
 }
 
+/*
+    Deze functie stelt timer 2 in voor het ontvangen van data en zet de receivepin op de goede stand
+*/
 void IR::enableReceiver(){
     cli(); // Zet even alle interrupt uit zodat dit goed ingesteld kan worden
 
@@ -39,6 +42,11 @@ void IR::enableReceiver(){
     IR::resumeReceiver(); // Ga data inlezen
 }
 
+/*
+    Deze functie vertaal de intervallen uit irparams.rawbuf en zet de data in results.data en results.bits
+    return 0 als er niet gedecode kan worden
+    return 1 als het decoden gelukt is
+*/
 uint8_t IR::decode(){
     if (irparams.receiveState != STOP){  //Dit check oP?
         IR::resumeReceiver(); // Ga nieuwe data inlezen
@@ -64,11 +72,17 @@ uint8_t IR::decode(){
     return 1;
 }
 
+/*
+    Deze functie zorgt ervoor dat er nieuwe data ingelezen gaat worden
+*/
 void IR::resumeReceiver(){
     irparams.receiveState = IDLE;
     irparams.rawlen = 0;
 }
 
+/*
+    Deze functie stelt timer 2 in voor het versturen van informatie
+*/
 void IR::setupSendTimer(uint8_t kHz){
     //Zet de interrupts tijdelijk uit
     cli();
@@ -82,24 +96,14 @@ void IR::setupSendTimer(uint8_t kHz){
     OCR2A = F_CPU / 2000 / kHz;
     OCR2B = (F_CPU / 2000 / kHz)/3;
 
-    // if(kHz == 38){
-    //     //Zet prescaler = 8
-    //     TCCR2B |= (1<<CS21);
-
-    //     //Zet OCR2A = 52
-    //     OCR2A = 52;
-    // }else if(kHz == 56){
-    //     //Zet prescaler = 8
-    //     TCCR2B |= (1<<CS21);
-
-    //     //Zet OCR2A = 36
-    //     OCR2A = 36;
-    // }
-
     //Zet de interrupts weer aan
     sei();
 }
 
+/*
+    Deze functie verstuurt data met lengte len
+    Aan het eind van data word een even parity bit toegevoegd
+*/
 void IR::send(uint16_t data, uint8_t len){
     //Zet de timer goed
     TIMSK2 = 0;
@@ -129,6 +133,9 @@ void IR::send(uint16_t data, uint8_t len){
     }
 }
 
+/*
+    Deze functie zorgt dat er een startbit verstuurt worden
+*/
 void IR::sendStartBit(){
     TCCR2A |= (1 << COM2B1);
     _delay_us(TIME_START);
@@ -137,6 +144,9 @@ void IR::sendStartBit(){
     _delay_us(TIME_LOW);
 }
 
+/*
+    Deze functie zorgt dat er een 1 verstuurt worden
+*/
 void IR::sendHigh(){
     TCCR2A |= (1 << COM2B1);
     _delay_us(TIME_1);
@@ -145,6 +155,9 @@ void IR::sendHigh(){
     _delay_us(TIME_LOW);
 }
 
+/*
+    Deze functie zorgt dat er een 0 verstuurt worden
+*/
 void IR::sendLow(){
     TCCR2A |= (1 << COM2B1);
     _delay_us(TIME_0);

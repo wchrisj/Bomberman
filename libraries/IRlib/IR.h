@@ -3,10 +3,10 @@
 
 #include "stdint.h"
 
-#define TIME_LOW 600
-#define TIME_0 600
-#define TIME_1 1200
-#define TIME_START 2400
+#define TIME_LOW 600    // De tijd dat het signaal HIGH is
+#define TIME_0 600      // De tijd dat het signaal LOW is voor een 0
+#define TIME_1 1200     // De tijd dat het signaal LOW is voor een 1
+#define TIME_START 2400 // De tijd dat het signaal LOW is voor een startbit
 
 #define HIGH 0 // Bij infrarood communicatie is het signaal 'HIGH', voor de leesbaarheid is het in deze library omgekeerd
 #define LOW  1
@@ -16,8 +16,6 @@
 #define MAX_ZERO_VALUE 900 // Wat is de hoogste waarde die een 0 mag hebben -> hoger is het een 1
 
 #define TIMER_COUNT_TOP  (F_CPU * USECPERTICK / 1000000) // Bij een prescaler van 0, wat is de top van de timer zodat er tussen 2 pulsen USECPERTICK tussen zit
-
-#define RECV_PIN PORTB3
 
 #define RAWBUF  101  // Maximale lengte van de buffer
 
@@ -52,9 +50,9 @@ irparams_t;
 
 typedef
     struct{
-        uint8_t receivePin;
-        uint8_t frequency;
-        uint8_t sendPin;
+        uint8_t receivePin;    // De pin waarmee infrarood ontvangen word
+        uint8_t frequency;     // De frequentie waarmee het infrarood signaal verstuurd word
+        uint8_t sendPin;       // De pin waarmee data verstuurt wordt
     }
 IRsettings_t;
 
