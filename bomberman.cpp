@@ -8,11 +8,8 @@ int main(){
 
     IR sender = IR(3, khz);
 
-
-    // DDRD |= (1 << DDD3);
-    // PIND |= (1 << DDD3);
     while(1){
-    sender.send(0xFF, 8);
+    sender.send(0xAA, 8);
     _delay_ms(500);
     }
 

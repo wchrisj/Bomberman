@@ -66,15 +66,12 @@ void IR::send(uint16_t data, uint8_t len){
 
     //Zend data en bereken paritybit
     uint8_t highBits = 0;
-    for(uint8_t i = len-1; i >= 0; i--){
+    for(uint8_t i = 0; i < len; i++){
         if(data & (1 << i)){
             IR::sendHigh();
             highBits++;
         }else{
             IR::sendLow();
-        }
-        if(i == 0){
-            break;
         }
     }
 
