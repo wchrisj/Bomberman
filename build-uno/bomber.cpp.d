@@ -11,6 +11,6 @@ build-uno/./bomber.cpp.o: bomber.cpp Adafruit_GFX.h \
  /usr/share/arduino/hardware/arduino//variants/standard/pins_arduino.h \
  /usr/share/arduino/hardware/arduino//cores/arduino/Print.h gfxfont.h \
  Adafruit_ILI9341.h /usr/share/arduino/libraries/SPI/SPI.h \
- Adafruit_SPITFT.h Adafruit_SPITFT_Macros.h \
- libraries/Game_logic/character.h libraries/Nunchuk/nunchuk.h \
- libraries/Game_logic/bomb.h
+ Adafruit_SPITFT.h Adafruit_SPITFT_Macros.h bomber.h \
+ libraries/Game_logic/character.h libraries/Game_logic/bomb.h \
+ libraries/Nunchuk/nunchuk.h

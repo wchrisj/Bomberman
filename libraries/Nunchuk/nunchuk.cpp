@@ -8,6 +8,17 @@
 #include "nunchuk.h"
 #define NUNCHUK_ADDR 0x52
 
+NunchukInput* NunchukInput::instance = 0;
+
+NunchukInput::NunchukInput() {}
+
+NunchukInput* NunchukInput::getInstance() {
+	if(instance == 0) {
+		instance = new NunchukInput();
+	}
+	return instance;
+}
+
 //0 = Horizontal
 //1 = Vertical
 //2 = Gyro

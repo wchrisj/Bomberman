@@ -17,4 +17,8 @@ build-uno/./libraries/Game_logic/bomb.cpp.o: \
  libraries/Game_logic/../../Adafruit_GFX.h \
  libraries/Game_logic/../../Adafruit_SPITFT.h \
  libraries/Game_logic/../../Adafruit_SPITFT_Macros.h \
- libraries/Game_logic/character.h libraries/Game_logic/bomb.h
+ libraries/Game_logic/../../bomber.h \
+ libraries/Game_logic/../../Adafruit_ILI9341.h \
+ libraries/Game_logic/../../libraries/Game_logic/character.h \
+ libraries/Game_logic/../../libraries/Game_logic/bomb.h \
+ libraries/Game_logic/../../libraries/Nunchuk/nunchuk.h

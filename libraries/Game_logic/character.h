@@ -1,13 +1,8 @@
 #ifndef CHARACTER.H
 #define CHARACTER.H
-
 class Character {
 public:
-
-	#define TFT_CS 10 // TFT select pin
-	#define TFT_DC  9 // TFT display/command pin
-
-	Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+	static Character* getInstance();
 
 	enum Direction { UP, RIGHT, DOWN, LEFT };
 	enum Direction direction;
@@ -18,8 +13,7 @@ public:
 	void move(Direction dir);
 	bool collision(Direction dir);
 private:
-
+	static Character* instance;
+	Character();
 };
-
-
 #endif

@@ -5,44 +5,56 @@
 #include "Adafruit_GFX.h"	// Core graphics library
 #include "Adafruit_ILI9341.h"	// Hardware-specific library
 
-#include "libraries/Game_logic/character.h"
-#include "libraries/Nunchuk/nunchuk.h"
-#include "libraries/Game_logic/bomb.h"
+#include "bomber.h"
 
 void gameTimerInit();
 
-Character character;
-NunchukInput Nunchuk;
+//F = Flag
+//C = Counter
+volatile char F_readNunchuk = 0;
+volatile char C_charMove = 0;
+volatile char C_bomb = 0;
 
-volatile char flag = 0;
-volatile char stepper = 0;
-volatile char bombTimer = 0;
+//Singleton design pattern
+//https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+NunchukInput* nunchuk = NunchukInput::getInstance();
+Character* character = Character::getInstance();
+Bomb* bomb = Bomb::getInstance();
 
-ISR(TIMER1_COMPA_vect) {
-	flag = 1;
-	stepper++;
-	bombTimer++;
-	if(stepper == 50) { //100ms
-		stepper = 0;
-		if (Nunchuk.status.UP == 1) {
-			character.move(Character::UP);
+
+ISR(TIMER1_COMPA_vect) { //Elke 2ms
+	F_readNunchuk = 1;
+	C_charMove++;
+	if(bomb->exists) {
+		C_bomb++;
+	}
+	if(C_charMove == 50) { //100ms
+		C_charMove = 0;
+		if (nunchuk->status.UP == 1) {
+			character->move(Character::UP);
+			Serial.println("UP");
 		}
-		else if (Nunchuk.status.RIGHT == 1) {
-			character.move(Character::RIGHT);
+		else if (nunchuk->status.RIGHT == 1) {
+			character->move(Character::RIGHT);
+			Serial.println("RIGHT");
 		}
-		else if (Nunchuk.status.DOWN == 1) {
-			character.move(Character::DOWN);
+		else if (nunchuk->status.DOWN == 1) {
+			character->move(Character::DOWN);
+			Serial.println("DOWN");
 		}
-		else if (Nunchuk.status.LEFT == 1) {
-			character.move(Character::LEFT);
+		else if (nunchuk->status.LEFT == 1) {
+			character->move(Character::LEFT);
+			Serial.println("LEFT");
 		}
-		if (Nunchuk.status.Z == 1) {
-			bomb.placeBomb();
+		if (nunchuk->status.Z == 1) {
+			bomb->placeBomb();
 		}
 	}
 
-	if (bombTimer == 2000) { //4seconds
-		bomb.explodeBomb();
+	if (C_bomb == 2000) { //4seconden
+		C_bomb = 0;
+		bomb->explodeBomb();
 	}
 }
 
@@ -50,17 +62,20 @@ int main (void)
 {
 	sei();
 	_delay_ms(50);
+	Serial.begin(9600);
 	gameTimerInit();
-	character.tft.begin();
-	character.tft.fillScreen(ILI9341_BLACK);	
+	tft.begin();
+	tft.fillScreen(ILI9341_BLACK);	
 
-	character.init(0, 0, 20, 20, ILI9341_YELLOW);
+	character->init(0, 0, 20, 20, ILI9341_YELLOW);
 
 	while (1)
 	{
-		if (flag == 1) {
-			flag = 0;
-			Nunchuk.nunchuk_get();
+		//Wire van nunchuk gebruikt een ISR. ISR in ISR mag niet.
+		//Vandaar een handmatige flag zodat het wel kan.
+		if (F_readNunchuk == 1) {
+			F_readNunchuk = 0;
+			nunchuk->nunchuk_get();
 		}
 	}
 

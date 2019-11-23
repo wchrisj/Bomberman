@@ -8,6 +8,8 @@
 #define NUNCHUK.H
 class NunchukInput {
 public:
+	static NunchukInput* getInstance();
+
 	struct input {
 		int UP, RIGHT, DOWN, LEFT, Z, C;
 	};
@@ -15,6 +17,8 @@ public:
 
 	void nunchuk_get();
 private:
+	static NunchukInput* instance;
+	NunchukInput();
 	void processNunchukData();
 };
 #endif
