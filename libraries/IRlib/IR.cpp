@@ -55,6 +55,7 @@ uint8_t IR::decode(){
 
     uint8_t dataBits = 0;
     uint16_t data = 0;
+    uint8_t highBitsCounter = 0;
     for (int i = 1; i < irparams.rawlen; i++) { //Helft van de getallen zijn verkeerd.
         if (!(i & 1)) { //We zijn alleen geinteresseerd in tijd dat het signaal LOW is
             if (i == 1) {
@@ -64,11 +65,21 @@ uint8_t IR::decode(){
             }else if (irparams.rawbuf[i] * 50 > MAX_ZERO_VALUE) {
                 data += (1 << dataBits);
                 dataBits++;
+                highBitsCounter++;
             }
         }
     }
-    results.data = data;
-    results.dataBits = dataBits;
+
+    dataBits--; // Het laaste bit is het parity bit en moet dus niet meetellen
+
+    //Kijk is het paritybit goed is, en de data dus goed is overgekomen
+    if(highBitsCounter & 1){ // Laaste bit is 1 dus oneven dus de data is niet goed
+        IR::resumeReceiver(); // Ga nieuwe data inlezen
+        return 0;
+    }
+
+    results.data = data - (1 << dataBits); // Het paritybit hoort niet bij de data
+    results.dataBits = dataBits; // Zonder parity bit
     return 1;
 }
 
