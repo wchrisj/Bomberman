@@ -30,12 +30,16 @@ void IR::enableReceiver(){
     DDRB &= ~(1 << IRsettings.receivePin);
     PORTB &= ~(1 << IRsettings.receivePin);
 
-    TCCR2A = (1 << WGM21);  // Zet de timer op CTC mode
-    TCCR2B = (1 << CS21);   // Zet de prescaler op 8
+    TCCR2A |= (1 << WGM21);  // Zet de timer op CTC mode
+    TCCR2A &= ~(1 << WGM20);
+    TCCR2B &= ~(1 << WGM22);
+
+    TCCR2B &= ~((1 << CS20) | (1 << CS22)); 
+    TCCR2B |= (1 << CS21);   // Zet de prescaler op 8
     OCR2A  = TIMER_COUNT_TOP / 8;
     TCNT2  = 0;
 
-    TIMSK2 = (1 << OCIE2A); // Zet timer interrupt aan
+    TIMSK2 |= (1 << OCIE2A); // Zet timer interrupt aan
 
     sei();  // Zet de interrupt weer aan
 
@@ -78,7 +82,8 @@ uint8_t IR::decode(){
         return 0;
     }
 
-    results.data = data - (1 << dataBits); // Het paritybit hoort niet bij de data
+    results.parityCheck = 1;
+    results.data = data & ~(1 << dataBits); // Het paritybit hoort niet bij de data
     results.dataBits = dataBits; // Zonder parity bit
     return 1;
 }
@@ -101,8 +106,11 @@ void IR::setupSendTimer(uint8_t kHz){
     //Stel de timer in 
     //Fast PWM, top = OCR2A
     TCCR2A |= (1 << WGM20);
+    TCCR2A &= ~(1 << WGM21); 
     TCCR2B |= (1 << WGM22);
+
     TCCR2B |= (1 << CS20); //Geen prescaling
+    TCCR2B &= ~((1 << CS21) | (1 << CS22));
 
     OCR2A = F_CPU / 2000 / kHz;
     OCR2B = (F_CPU / 2000 / kHz)/3;
