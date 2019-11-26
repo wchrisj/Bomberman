@@ -114,6 +114,12 @@ void IR::setupSendTimer(uint8_t kHz){
     OCR2A = F_CPU / 2000 / kHz;
     OCR2B = (F_CPU / 2000 / kHz)/3;
 
+    TIMSK2 = 0; // Geen timer interrupts
+
+    // Zendpin instellen als output pin
+    DDRD |= (1 << DDD3);
+    PIND &= ~(1 << DDD3);
+
     //Zet de interrupts weer aan
     sei();
 }
@@ -124,9 +130,6 @@ void IR::setupSendTimer(uint8_t kHz){
 */
 void IR::send(uint8_t identifier, uint16_t data, uint8_t len){
     //Zet de timer goed
-    TIMSK2 = 0;
-    DDRD |= (1 << DDD3);
-    PIND &= ~(1 << DDD3);
     IR::setupSendTimer(IRsettings.frequency);
 
     //Zend start bit
