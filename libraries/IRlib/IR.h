@@ -59,7 +59,7 @@ IRsettings_t;
 class IR{
     public:
         IR(uint8_t receivePin, uint8_t kHz);
-        void send(uint16_t data, uint8_t len);
+        void send(uint8_t identifier, uint16_t data, uint8_t len);
         void enableReceiver();
         void resumeReceiver();
         uint8_t decode();

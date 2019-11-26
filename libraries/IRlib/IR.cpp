@@ -11,11 +11,8 @@ irparams_t irparams;
     stelt de zendpin en ontvangpin in en stelt de frequent van de timer op de zendpin in
 */
 IR::IR(uint8_t receivePin, uint8_t kHz){
-    //Maak sender en receiver aan
-    //Vul IRsettings
-
     IRsettings.receivePin = receivePin; // Zet de receivePin
-    IRsettings.frequency = kHz;
+    IRsettings.frequency = kHz;         // Stel de frequentie in
     IRsettings.sendPin = (1 << PIND3); //Zet de zendpin als pin D3, deze hoort bij timer 2
     setupSendTimer(kHz);
 }
@@ -84,7 +81,9 @@ uint8_t IR::decode(){
 
     results.parityCheck = 1;
     results.data = data & ~(1 << dataBits); // Het paritybit hoort niet bij de data
-    results.dataBits = dataBits; // Zonder parity bit
+    results.data = results.data >> 2; // Eerste 2 bits zijn identifiers en geen data
+    results.identifier = data & 0x03;
+    results.dataBits = dataBits-2; // Zonder parity bit
     return 1;
 }
 
@@ -123,7 +122,7 @@ void IR::setupSendTimer(uint8_t kHz){
     Deze functie verstuurt data met lengte len
     Aan het eind van data word een even parity bit toegevoegd
 */
-void IR::send(uint16_t data, uint8_t len){
+void IR::send(uint8_t identifier, uint16_t data, uint8_t len){
     //Zet de timer goed
     TIMSK2 = 0;
     DDRD |= (1 << DDD3);
@@ -135,6 +134,14 @@ void IR::send(uint16_t data, uint8_t len){
 
     //Zend data en bereken paritybit
     uint8_t highBits = 0;
+    for(uint8_t i = 0; i < 2; i++){
+        if(identifier & (1 << i)){
+            IR::sendHigh();
+            highBits++;
+        }else{
+            IR::sendLow();
+        }
+    }
     for(uint8_t i = 0; i < len; i++){
         if(data & (1 << i)){
             IR::sendHigh();
@@ -202,7 +209,7 @@ ISR (TIMER2_COMPA_vect){
                     irparams.rawlen++;                                      // Zet de lengte van de buffer +1
                     irparams.overflow                = 0;                   // Zet overflow op false
                     irparams.rawlen                  = 0;                   // Begin opnieuw met data in het buffer te plaatsen
-                    irparams.rawbuf[irparams.rawlen] = irparams.timer;  // Sla de tijd op in het buffer
+                    irparams.rawbuf[irparams.rawlen] = irparams.timer;      // Sla de tijd op in het buffer
                     irparams.timer                   = 0;                   // Start de timer opnieuw
                     irparams.receiveState            = MARK;                // Zet de status op het meten van signaal HIGH
                 }
@@ -210,14 +217,14 @@ ISR (TIMER2_COMPA_vect){
             break;
         case MARK: // Wordt de tijd dat het signaal HIGH is gemeten
             if (irdata == LOW) {   // Is het signaal niet meer HIGH -> sla dan de tijd op
-                irparams.rawbuf[irparams.rawlen++] = irparams.timer;    // Sla de tijd op
+                irparams.rawbuf[irparams.rawlen++] = irparams.timer;        // Sla de tijd op
                 irparams.timer                     = 0;                     // Reset de timer zodat een nieuwe meting gedaan kan worden
                 irparams.receiveState              = SPACE;                 // Begin de signaal LOW meting
             }
             break;
         case SPACE: // Wordt de tijd dat het signaal HIGH is gemeten
             if (irdata == HIGH) {  // Is het signaal niet meer LOW -> sla dan de tijd op
-                irparams.rawbuf[irparams.rawlen++] = irparams.timer;    // Sla de tijd op
+                irparams.rawbuf[irparams.rawlen++] = irparams.timer;        // Sla de tijd op
                 irparams.timer                     = 0;                     // Reset de timer zodat een nieuwe meting gedaan kan worden
                 irparams.receiveState              = MARK;                  // Begin de signaal HIGH meting
             } else if (irparams.timer > GAP_TICKS) {  // Is het signaal lang LOW, dan wordt er geen data meer verstuurd -> zet de status op stop
