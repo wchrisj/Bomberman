@@ -21,18 +21,12 @@ Character* Character::getInstance() {
 //Maakt de character zichtbaar op het scherm.
 void Character::init(int _y, int _x, int _height, int _width, uint16_t _color) {
 	x = _x;
+	prevX = _x;
 	y = _y;
+	prevY = _y;
 	height = _height;
 	width = _width;
 	color = _color;
-	tft.fillRect(_y, _x, _height, _width, _color);
-}
-
-//Wordt gebruikt om verscheidene objecten te tekenen op het scherm.
-//Bomb wordt expliciet getekend zodat die nooit overgetekend kan worden.
-void Character::draw(int y, int x, int height, int width, uint16_t color) {
-	tft.fillRect(bomb->bombY, bomb->bombX, height, width, ILI9341_RED);
-	tft.fillRect(y, x, height, width, color);
 }
 
 //Er wordt gekeken welke kant de character op zou moeten gaan.
@@ -44,63 +38,90 @@ void Character::draw(int y, int x, int height, int width, uint16_t color) {
 void Character::move(Direction dir) {
 	if (dir == Character::UP) {
 		if ((y + height) < 240 && collision(Character::UP)) {
-			draw(y, x, height, width, ILI9341_BLACK);
+			prevY = y;
+			prevX = x;
 			y += height;
-			draw(y, x, height, width, color);
 		}
 	}
 	else if (dir == Character::RIGHT) {
 		if ((x + width) < 320 && collision(Character::RIGHT)) {
-			draw(y, x, height, width, ILI9341_BLACK);
+			prevY = y;
+			prevX = x;
 			x += width;
-			draw(y, x, height, width, color);
 		}
 	}
 	else if (dir == Character::DOWN) {
 		if ((y - height) > -1 && collision(Character::DOWN)) {
-			draw(y, x, height, width, ILI9341_BLACK);
+			prevY = y;
+			prevX = x;
 			y -= height;
-			draw(y, x, height, width, color);
 		}
 	}
 	else if (dir == Character::LEFT) {
 		if ((x - width) > -1 && collision(Character::LEFT)) {
-			draw(y, x, height, width, ILI9341_BLACK);
+			prevY = y;
+			prevX = x;
 			x -= width;
-			draw(y, x, height, width, color);
 		}
 	}
 }
 
 //Bekijkt of er in de gekozen richting een obstakel staat e.g. bom of muur.
 bool Character::collision(Direction dir) {
+
 	if (dir == Character::UP) {
 		//Check Up
-		if (((y + height) != bomb->bombY ||
-			x != bomb->bombX) && bomb->exists) {
-			return true;
-		}
+		return true;
+		// if(bombs[0].exists) {
+		// 	if((y + height) == bombs[0].bombY &&
+		// 		x != bombs[0].bombX) {
+		// 		return true;
+		// 	} else if ((y == bombs[0].bombY) &&
+		// 			   (x == bombs[0].bombX))  {
+		// 		return true;
+		// 	}
+		// } else {
+		// 	return true;
+		// }
 	}
 	else if (dir == Character::RIGHT) {
 		//Check Right
-		if ((x + width) != bomb->bombX ||
-			y != bomb->bombY) {
-			return true;
-		}
+		return true;
+		// if(bombs[0].exists) {
+		// 	if((x + width) == bombs[0].bombX &&
+		// 		y != bombs[0].bombY) {
+		// 		return true;
+		// 	}
+		// } else {
+		// 	return true;
+		// }
 	}
 	else if (dir == Character::DOWN) {
 		//Check Down
-		if ((y - height) != bomb->bombY ||
-			x != bomb->bombX) {
-			return true;
-		}
+		return true;
+		// if(bombs[0].exists) {
+		// 	if((y - height) == bombs[0].bombY &&
+		// 		x != bombs[0].bombX) {
+		// 		return true;
+		// 	} else if (y == bombs[0].bombY &&
+		// 			   x == bombs[0].bombX)  {
+		// 		return true;
+		// 	}
+		// } else {
+		// 	return true;
+		// }
 	}
 	else if (dir == Character::LEFT) {
 		//Check Left
-		if ((x - width) != bomb->bombX ||
-			y != bomb->bombY) {
-			return true;
-		}
+		return true;
+		// if(bombs[0].exists) {
+		// 	if((x - width) == bombs[0].bombX &&
+		// 		y != bombs[0].bombY) {
+		// 		return true;
+		// 	}
+		// } else {
+		// 	return true;
+		// }
 	}
 	
 	return false;

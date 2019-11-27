@@ -11,7 +11,7 @@
 
 extern Adafruit_ILI9341 tft;
 extern Character* character;
-extern Bomb* bomb;
+extern Bomb bombs[1];
 extern NunchukInput* nunchuk;
 
 #endif
