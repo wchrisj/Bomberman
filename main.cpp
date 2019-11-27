@@ -16,9 +16,7 @@ int main(void)
 	sei();
 	while (1)
 	{
-		NI.nunchuk_get();
-		setLed();
-		_delay_ms(10);
+		nunchuk->nunchuk_get();
+		_delay_ms(100);
 	}
 }
-

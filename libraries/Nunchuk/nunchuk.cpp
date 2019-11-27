@@ -55,13 +55,11 @@ void NunchukInput::processNunchukData() {
 	else if (nunchuk_data[0] >= 212) {
 		status.RIGHT = 1;
 		status.LEFT = 0;
-		Serial.println("RIGHT");
 	}
 	//Thumbstick naar links
 	else if (nunchuk_data[0] <= 44) {
 		status.RIGHT = 0;
 		status.LEFT = 1;
-		Serial.println("LEFT");
 	}
 
 	//Neutrale Y positie
@@ -73,13 +71,11 @@ void NunchukInput::processNunchukData() {
 	else if (nunchuk_data[1] >= 212) {
 		status.UP = 1;
 		status.DOWN = 0;
-		Serial.println("UP");
 	}
 	//Thumbstick naar onderen
 	else if (nunchuk_data[1] <= 44) {
 		status.UP = 0;
 		status.DOWN = 1;
-		Serial.println("DOWN");
 	}
 
 	//Knop Z&C zijn niet ingedrukt
@@ -91,18 +87,15 @@ void NunchukInput::processNunchukData() {
 	else if (nunchuk_data[5] == 2) {
 		status.Z = 1;
 		status.C = 0;
-		Serial.println("Z");
 	}
 	//Knop C is ingedrukt
 	else if (nunchuk_data[5] == 1) {
 		status.Z = 0;
 		status.C = 1;
-		Serial.println("C");
 	}
 	//Knop Z&C zijn beiden ingedrukt
 	else if (nunchuk_data[5] == 0) {
 		status.Z = 1;
 		status.C = 1;
-		Serial.println("Z & C");
 	}
 }
