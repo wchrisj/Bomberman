@@ -33,7 +33,7 @@ void IR::enableReceiver(){
 
     TCCR2B &= ~((1 << CS20) | (1 << CS22)); 
     TCCR2B |= (1 << CS21);   // Zet de prescaler op 8
-    OCR2A  = TIMER_COUNT_TOP / 8;
+    OCR2A  = TIMER_COUNT_TOP / 8; // delen door prescaler
     TCNT2  = 0;
 
     TIMSK2 |= (1 << OCIE2A); // Zet timer interrupt aan
@@ -61,9 +61,9 @@ uint8_t IR::decode(){
         if (!(i & 1)) { //We zijn alleen geinteresseerd in tijd dat het signaal LOW is
             if (i == 1) {
                 //Start bit
-            }else if (irparams.rawbuf[i] * 50 <= MAX_ZERO_VALUE) {
+            }else if (irparams.rawbuf[i] * USECPERTICK <= MAX_ZERO_VALUE) {
                 dataBits++;
-            }else if (irparams.rawbuf[i] * 50 > MAX_ZERO_VALUE) {
+            }else if (irparams.rawbuf[i] * USECPERTICK > MAX_ZERO_VALUE) {
                 data += (1 << dataBits);
                 dataBits++;
                 highBitsCounter++;
@@ -81,8 +81,8 @@ uint8_t IR::decode(){
 
     results.parityCheck = 1;
     results.data = data & ~(1 << dataBits); // Het paritybit hoort niet bij de data
-    results.data = results.data >> 2; // Eerste 2 bits zijn identifiers en geen data
-    results.identifier = data & 0x03;
+    results.data = results.data >> IDENTIFIER_LENGTH; // Eerste 2 bits zijn identifiers en geen data
+    results.identifier = data & IDENTIFIER_MASK;
     results.dataBits = dataBits-2; // Zonder parity bit
     return 1;
 }
@@ -111,8 +111,8 @@ void IR::setupSendTimer(uint8_t kHz){
     TCCR2B |= (1 << CS20); //Geen prescaling
     TCCR2B &= ~((1 << CS21) | (1 << CS22));
 
-    OCR2A = F_CPU / 2000 / kHz;
-    OCR2B = (F_CPU / 2000 / kHz)/3;
+    OCR2A = F_CPU / 2000 / kHz;         // Bereken met de frequentie/1000 de hoeveel stappen per clock, dit 2x want phase correct
+    OCR2B = (F_CPU / 2000 / kHz)/3;     // Zorg voor een 2/3 dutycycle(67%)
 
     TIMSK2 = 0; // Geen timer interrupts
 
@@ -137,7 +137,7 @@ void IR::send(uint8_t identifier, uint16_t data, uint8_t len){
 
     //Zend data en bereken paritybit
     uint8_t highBits = 0;
-    for(uint8_t i = 0; i < 2; i++){
+    for(uint8_t i = 0; i < IDENTIFIER_LENGTH; i++){
         if(identifier & (1 << i)){
             IR::sendHigh();
             highBits++;

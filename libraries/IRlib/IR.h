@@ -10,6 +10,8 @@
 
 #define HIGH 0 // Bij infrarood communicatie is het signaal 'HIGH', voor de leesbaarheid is het in deze library omgekeerd
 #define LOW  1
+#define IDENTIFIER_MASK 0x03
+#define IDENTIFIER_LENGTH 2
 
 #define USECPERTICK 50 // Hoeveel tijd zit er tussen de metingen?
 #define GAP_TICKS 100 // Hoeveel ticks mag het signaal achter elkaar LOW zijn, als er geen data verstuurt word is het signaal LOW
