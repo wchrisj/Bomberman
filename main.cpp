@@ -7,6 +7,7 @@
 
 #include <avr/interrupt.h>
 #include <util/delay.h>
+#include <HardwareSerial.h>
 #include "libraries/Nunchuk/nunchuk.h"
 
 NunchukInput* nunchuk = NunchukInput::getInstance();
@@ -14,6 +15,7 @@ NunchukInput* nunchuk = NunchukInput::getInstance();
 int main(void)
 {
 	sei();
+	Serial.begin(9600);
 	while (1)
 	{
 		nunchuk->nunchuk_get();
