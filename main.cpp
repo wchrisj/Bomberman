@@ -1,15 +1,10 @@
-/*
- * Main.cpp
- *
- * Created: 13/11/2019 11:35:58
- * Author : sbrol
- */
-
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <HardwareSerial.h>
 #include "libraries/Nunchuk/nunchuk.h"
 #include "libraries/IRlib/IR.h"
+#include <SPI.h> // moet nog iets op worden gevonden dat deze kan worden geinclude in LCD.h
+#include "LCD.h"
 
 NunchukInput* nunchuk = NunchukInput::getInstance();
 
@@ -17,6 +12,12 @@ int main(void)
 {
 	sei();
 	Serial.begin(115200);
+  
+   LCD lcd = LCD();
+   lcd.drawWall(3, 4);
+   lcd.drawMap();
+   lcd.statusBar();
+  
 	IR ir = IR(3, 38);
 	ir.enableReceiver();
 	while (1)
