@@ -9,15 +9,16 @@
 #define TFT_DC 9
 #define TFT_CS 10
 
-#define blok 16
-#define lengte 320
-#define breedte 240
+#define BLOCK_SIZE 16
+#define LENGTH 320
+#define WIDTH 240
 
 class LCD {
     public:
         LCD();
         void drawWall(uint8_t x, uint8_t y);
         void drawMap();
+        void statusBar();
     
     private:
 };
