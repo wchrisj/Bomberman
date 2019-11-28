@@ -7,6 +7,9 @@
 
 #include "bomber.h"
 
+#define CHARACTER_MOVE 100
+#define BOMB_EXPLODE 2000
+
 void gameTimerInit();
 void draw();
 
@@ -32,7 +35,7 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	if(bombs[1].exists) {
 		C_bombs[1]++;
 	}
-	if(C_charMove == 100) { //200ms
+	if(C_charMove == CHARACTER_MOVE) { //200ms
 		C_charMove = 0;
 		if (nunchuk->status.UP == 1) {
 			character->move(Character::UP);
@@ -58,11 +61,11 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 		draw();
 	}
 
-	if (C_bombs[0] == 6000) { //12seconden
+	if (C_bombs[0] == BOMB_EXPLODE) { //12seconden
 		C_bombs[0] = 0;
 		bombs[0].explodeBomb();
 	}
-	if (C_bombs[1] == 2000) {
+	if (C_bombs[1] == BOMB_EXPLODE) {
 		C_bombs[1] = 0;
 		bombs[1].explodeBomb();
 	}
