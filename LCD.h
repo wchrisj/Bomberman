@@ -1,7 +1,7 @@
 #ifndef LCD_H
 #define LCD_H
 
-#include <avr/io.h>
+#include <avr/io.h>  //zou mss mooi zijn als die uiteindelijk 1 keer word geinclude in de main
 #include "libraries/AdafruitGFX/Adafruit_GFX.h"
 #include "libraries/ILI9341/Adafruit_ILI9341.h"
 

@@ -1,4 +1,4 @@
-#include <SPI.h>
+#include <SPI.h> // moet nog iets op worden gevonden dat deze kan worden geinclude in LCD.h
 #include "LCD.h"
 
 int main(){

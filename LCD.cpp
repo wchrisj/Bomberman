@@ -20,24 +20,24 @@ void LCD::drawWall(uint8_t x, uint8_t y) {
 
 void LCD::drawMap(){
     tft.fillScreen(ILI9341_BLACK);
-  // teken verticaal links                        // x─┐
+  // teken verticaal links                              // x─┐
   for (int i = 0; i < (LENGTH / BLOCK_SIZE) - 1; i++){  // x │
-    drawWall(0, i);                                   // x─┘
+    drawWall(0, i);                                     // x─┘
   }
   
-  //teken horizontaal boven                       // xxx
-  for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){     // │ │
-    drawWall(i, 0);                                   // └─┘
+  //teken horizontaal boven                             // xxx
+  for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){       // │ │
+    drawWall(i, 0);                                     // └─┘
   }
   
-  // teken horizontaal onder                      // ┌─┐
-  for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){     // │ │
-    drawWall(i, (LENGTH / BLOCK_SIZE) - 2);                 // xxx
+  // teken horizontaal onder                            // ┌─┐
+  for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){       // │ │
+    drawWall(i, (LENGTH / BLOCK_SIZE) - 2);             // xxx
   }
   
-  // teken rechts verticaal                       // ┌─x
+  // teken rechts verticaal                             // ┌─x
   for (int i = 0; i < (LENGTH / BLOCK_SIZE) - 1; i++){  // │ x
-    drawWall((WIDTH / BLOCK_SIZE) - 1, i);                // └─x
+    drawWall((WIDTH / BLOCK_SIZE) - 1, i);              // └─x
   }
 
   // teken de losse BLOCK_SIZEken in het midden
