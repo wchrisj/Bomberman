@@ -8,6 +8,9 @@
 #include <HardwareSerial.h>
 #include "nunchuk.h"
 #define NUNCHUK_ADDR 0x52
+#define LESS_THAN 64
+#define NEUTRAL 128
+#define MORE_THAN 192
 
 NunchukInput* NunchukInput::instance = 0;
 
@@ -48,36 +51,36 @@ void NunchukInput::nunchuk_get() {
 //Opgevraagde data verwerken voor een betere leesbaarheid
 void NunchukInput::processNunchukData() {
 	//Neutrale X positie
-	if (nunchuk_data[0] == 128) {
+	if (nunchuk_data[0] == NEUTRAL) {
 		status.RIGHT = 0;
 		status.LEFT = 0;
 	}
 	//Thumbstick naar rechts
-	else if (nunchuk_data[0] >= 212) {
+	else if (nunchuk_data[0] >= MORE_THAN) {
 		status.RIGHT = 1;
 		status.LEFT = 0;
 		Serial.println("RIGHT");
 	}
 	//Thumbstick naar links
-	else if (nunchuk_data[0] <= 44) {
+	else if (nunchuk_data[0] <= LESS_THAN) {
 		status.RIGHT = 0;
 		status.LEFT = 1;
 		Serial.println("LEFT");
 	}
 
 	//Neutrale Y positie
-	if (nunchuk_data[1] == 128) {
+	if (nunchuk_data[1] == NEUTRAL) {
 		status.UP = 0;
 		status.DOWN = 0;
 	}
 	//Thumbstick naar boven
-	else if (nunchuk_data[1] >= 212) {
+	else if (nunchuk_data[1] >= MORE_THAN) {
 		status.UP = 1;
 		status.DOWN = 0;
 		Serial.println("UP");
 	}
 	//Thumbstick naar onderen
-	else if (nunchuk_data[1] <= 44) {
+	else if (nunchuk_data[1] <= LESS_THAN) {
 		status.UP = 0;
 		status.DOWN = 1;
 		Serial.println("DOWN");
