@@ -2,9 +2,8 @@
 #include <util/delay.h>
 #include <avr/interrupt.h>
 
-#include "Adafruit_GFX.h"	// Core graphics library
-#include "Adafruit_ILI9341.h"	// Hardware-specific library
-
+#include "libraries/AdafruitGFX/Adafruit_GFX.h"
+#include "libraries/ILI9341/Adafruit_ILI9341.h"
 #include "bomber.h"
 
 #define CHARACTER_MOVE 100
@@ -37,6 +36,7 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	}
 	if(C_charMove == CHARACTER_MOVE) { //200ms
 		C_charMove = 0;
+		Serial.println("boop");
 		if (nunchuk->status.UP == 1) {
 			character->move(Character::UP);
 			Serial.println("UP");
@@ -77,8 +77,9 @@ int main (void)
 	_delay_ms(50);
 	Serial.begin(9600);
 	tft.begin();
-	tft.fillScreen(ILI9341_BLACK);	
-	character->init(0, 0, 20, 20, ILI9341_YELLOW);
+	LCD lcd = LCD();
+	lcd.drawMap();
+	character->init(0, 0, 16, 16, ILI9341_YELLOW);
 	gameTimerInit();
 
 	while (1)

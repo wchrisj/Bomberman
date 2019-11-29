@@ -1,5 +1,5 @@
 BOARD_TAG = uno
-ARDUINO_LIBS = Wire SD SPI
+ARDUINO_LIBS = Wire SPI SD
 LOCAL_CPP_SRCS += $(wildcard *.cpp)
 LOCAL_CPP_SRCS += $(wildcard libraries/*.cpp)
 LOCAL_CPP_SRCS += $(wildcard libraries/*/*.cpp)
