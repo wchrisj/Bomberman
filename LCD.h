@@ -4,10 +4,11 @@
 #include <avr/io.h>  //zou mss mooi zijn als die uiteindelijk 1 keer word geinclude in de main
 #include "libraries/AdafruitGFX/Adafruit_GFX.h"
 #include "libraries/ILI9341/Adafruit_ILI9341.h"
+#include "libraries/AdafruitSD/Adafruit_ImageReader.h"
 
-
-#define TFT_DC 9
-#define TFT_CS 10
+#define SD_CS   4 // SD card select pin
+#define TFT_DC  9 // TFT display/command pin
+#define TFT_CS 10 // TFT select pin
 
 #define BLOCK_SIZE 16
 #define LENGTH 320

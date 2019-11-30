@@ -21,6 +21,10 @@ volatile int C_bombs[1];
 //Singleton design pattern
 //https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+Adafruit_ImageReader reader;     // Class w/image-reading functions
+Adafruit_Image       img;        // An image loaded into RAM
+int32_t              width  = 0, // BMP image dimensions
+                     height = 0;
 NunchukInput* nunchuk = NunchukInput::getInstance();
 Character* character = Character::getInstance();
 Bomb bombs[1];
@@ -77,10 +81,24 @@ int main (void)
 	_delay_ms(50);
 	Serial.begin(9600);
 	tft.begin();
+
+	tft.fillScreen(ILI9341_BLACK);
+	Serial.print(F("Initializing SD card..."));
+	if(!SD.begin(SD_CS)) {
+    	Serial.println(F("failed!"));
+    	for(;;); // Loop here forever
+	}
+	Serial.println(F("OK!"));
+	Serial.print(F("Loading purple.bmp to screen..."));
+	reader.drawBMP("/purple.bmp", tft, 0, 0);
+
 	LCD lcd = LCD();
 	lcd.drawMap();
 	character->init(0, 0, 16, 16, ILI9341_YELLOW);
 	gameTimerInit();
+
+	reader.drawBMP("/p1.bmp", tft, 48, 48); //tekent player 1, moet nog aan charcter worder gekoppeld
+	reader.drawBMP("/p1.bmp", tft, 80, 64);
 
 	while (1)
 	{
