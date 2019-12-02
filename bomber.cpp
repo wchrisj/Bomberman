@@ -80,25 +80,28 @@ int main (void)
 	sei();
 	_delay_ms(50);
 	Serial.begin(9600);
-	tft.begin();
+	//tft.begin();
+	LCD lcd = LCD();
 
-	tft.fillScreen(ILI9341_BLACK);
 	Serial.print(F("Initializing SD card..."));
 	if(!SD.begin(SD_CS)) {
-    	Serial.println(F("failed!"));
+    	Serial.println(F("failed!")); //ffail detection werkt niet
     	for(;;); // Loop here forever
 	}
 	Serial.println(F("OK!"));
-	Serial.print(F("Loading purple.bmp to screen..."));
-	reader.drawBMP("/purple.bmp", tft, 0, 0);
 
-	LCD lcd = LCD();
 	lcd.drawMap();
+	lcd.statusBar();
+	// dit uiteindelijk allemaal in LCD
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 1+8, LENGTH - BLOCK_SIZE); //tekent ❤️
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 2+10, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 3+12, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 7+8, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 8+10, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 9+12, LENGTH - BLOCK_SIZE);
+
 	character->init(0, 0, 16, 16, ILI9341_YELLOW);
 	gameTimerInit();
-
-	reader.drawBMP("/p1.bmp", tft, 48, 48); //tekent player 1, moet nog aan charcter worder gekoppeld
-	reader.drawBMP("/p1.bmp", tft, 80, 64);
 
 	while (1)
 	{
@@ -113,7 +116,7 @@ int main (void)
 	return(0);
 }
 
-void gameTimerInit() {
+void gameTimerInit() { //dit mss in gamelogic?
 	TCCR1A = 0; // set entire TCCR1A register to 0
 	TCCR1B = 0; // same for TCCR1B
 	TCNT1 = 0; // initialize counter value to 0
@@ -127,14 +130,14 @@ void gameTimerInit() {
 	TIMSK1 |= (1 << OCIE1A);
 }
 
-void draw() {
-	if((character->prevX != character->x) || (character->prevY != character->y)) {	
-		tft.fillRect(character->prevY, character->prevX, character->height, character->width, ILI9341_BLACK);
+void draw() {  //mss dat deze functie in LCD moet?
+	if((character->prevX != character->x) || (character->prevY != character->y)) {
+		reader.drawBMP("/p1.bmp", tft, character->y, character->x); //tekent player 1 vanaf SD kaart
+		tft.fillRect(character->prevY, character->prevX, character->height, character->width, BG_COLOR);
 	}
-	tft.fillRect(character->y, character->x, character->height, character->width, ILI9341_YELLOW);
 	if(bombs[0].exists == true) {
-		tft.fillRect(bombs[0].bombY, bombs[0].bombX, character->height, character->width, ILI9341_RED);
+		reader.drawBMP("/b.bmp", tft, bombs[0].bombY, bombs[0].bombX); //tekent player 1 vanaf SD kaart
 	} else {
-		tft.fillRect(bombs[0].bombY, bombs[0].bombX, character->height, character->width, ILI9341_BLACK);
+		tft.fillRect(bombs[0].bombY, bombs[0].bombX, character->height, character->width, BG_COLOR);
 	}
 }

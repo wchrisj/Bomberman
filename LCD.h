@@ -14,6 +14,8 @@
 #define LENGTH 320
 #define WIDTH 240
 
+#define BG_COLOR 0x2184 // background color
+
 class LCD {
     public:
         LCD();

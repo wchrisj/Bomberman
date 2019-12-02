@@ -3,20 +3,21 @@
 
 LCD::LCD() {
     tft.begin();
+    tft.fillScreen(BG_COLOR);
 }
 
 void LCD::drawWall(uint8_t x, uint8_t y) {
     tft.drawRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, ILI9341_WHITE);
     tft.drawRect(x * BLOCK_SIZE + 1, y * BLOCK_SIZE + 1, BLOCK_SIZE - 3, BLOCK_SIZE - 3, ILI9341_WHITE);
     tft.fillRect(x * BLOCK_SIZE + 2, y * BLOCK_SIZE + 2, BLOCK_SIZE - 4, BLOCK_SIZE - 4, ILI9341_LIGHTGREY);
-    tft.drawPixel(x * BLOCK_SIZE, y * BLOCK_SIZE, ILI9341_BLACK);
+    tft.drawPixel(x * BLOCK_SIZE, y * BLOCK_SIZE, ILI9341_DARKGREY);
     tft.drawPixel(x * BLOCK_SIZE + 1, y * BLOCK_SIZE, ILI9341_LIGHTGREY);
     tft.drawPixel(x * BLOCK_SIZE, y * BLOCK_SIZE + 1, ILI9341_LIGHTGREY);
     //objects[y * 15 + x] = 1; // zet getekende muur in objecten array (maar array is hier nog niet aangemaakt)
 }
 
 void LCD::drawMap(){
-    tft.fillScreen(ILI9341_BLACK);
+    //tft.fillScreen(ILI9341_BLACK);
   // teken verticaal links                              // x─┐
   for (int i = 0; i < (LENGTH / BLOCK_SIZE) - 1; i++){  // x │
     drawWall(0, i);                                     // x─┘
@@ -46,9 +47,11 @@ void LCD::drawMap(){
 }
 
 void LCD::statusBar(){
+  tft.fillRect(0, LENGTH - BLOCK_SIZE, WIDTH, BLOCK_SIZE, ILI9341_BLACK);
   tft.setCursor(0, LENGTH - BLOCK_SIZE +2);
-  tft.setTextColor(ILI9341_YELLOW);  tft.setTextSize(2);
+  tft.setTextColor(ILI9341_BLUE);  tft.setTextSize(2);
   tft.print("P1");
-  tft.setTextColor(ILI9341_BLUE);
-  tft.print(" P2");
+  tft.setTextColor(ILI9341_YELLOW);
+  tft.setCursor(BLOCK_SIZE * 6, LENGTH - BLOCK_SIZE +2);
+  tft.print("P2");
 }
