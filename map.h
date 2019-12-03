@@ -5,7 +5,34 @@
 
 #define FREEZONE_PLACES_COUNT 18 // 2 freezones, 9 plekken per freezone
 #define PART_COUNT 7 // Er zijn 7 gebieden
-#define MAP_SIZE 285 // 15*19
+#define PART_CORNER_COUNT PART_COUNT*2 // Hoeveel hoeken zijn er, linkerbovenhoek en rechteronderhoek
+#define MAP_WIDTH 15    // Hoe breed is de map
+#define MAP_HEIGHT 19   // Hoe hoog is de map
+#define MAP_SIZE MAP_WIDTH*MAP_HEIGHT   // Hoeveel verschillende plekken zijn er in de map
+
+#define SEED_MASK_PART_A 0
+#define SEED_MASK_PART_B 2
+#define SEED_MASK_PART_C 4
+#define SEED_MASK_PART_D 6
+#define SEED_MASK_PART_E 8
+#define SEED_MASK_PART_F 10
+#define SEED_MASK_PART_G 12
+#define SEED_MASK_LAYOUT 14
+
+#define LAYOUT_UPPERLEFT_CORNER_PART_A 0
+#define LAYOUT_LOWERRIGHT_CORNER_PART_A 1
+#define LAYOUT_UPPERLEFT_CORNER_PART_B 2
+#define LAYOUT_LOWERRIGHT_CORNER_PART_B 3
+#define LAYOUT_UPPERLEFT_CORNER_PART_C 4
+#define LAYOUT_LOWERRIGHT_CORNER_PART_C 5
+#define LAYOUT_UPPERLEFT_CORNER_PART_D 6
+#define LAYOUT_LOWERRIGHT_CORNER_PART_D 7
+#define LAYOUT_UPPERLEFT_CORNER_PART_E 8
+#define LAYOUT_LOWERRIGHT_CORNER_PART_E 9
+#define LAYOUT_UPPERLEFT_CORNER_PART_F 10
+#define LAYOUT_LOWERRIGHT_CORNER_PART_F 11
+#define LAYOUT_UPPERLEFT_CORNER_PART_G 12
+#define LAYOUT_LOWERRIGHT_CORNER_PART_G 13
 
 #define LAYOUT_CRATES_0 0x4147221   // Hoe leg ik dit uit?
 #define LAYOUT_CRATES_1 0x8A27B07

@@ -5,8 +5,8 @@ uint8_t map[MAP_SIZE];
 void Map::createMap(uint16_t seed){ 
     layout_t layout = createLayout(seed);
   
-    for(int place = 0; place<285; place++){
-        for(uint8_t partCounter = 0; partCounter<7; partCounter++){
+    for(int place = 0; place<MAP_SIZE; place++){
+        for(uint8_t partCounter = 0; partCounter<PART_COUNT; partCounter++){
             if(fillPart(&layout.parts[partCounter], place)){
                 map[place] = TYPE_CRATE;
             }
@@ -14,21 +14,21 @@ void Map::createMap(uint16_t seed){
         if(cellIs(layout.freezone, sizeof(layout.freezone), place)){
             map[place] = TYPE_AIR; // Freezone
         }
-        createWalls(15, 19);
+        createWalls(MAP_WIDTH, MAP_HEIGHT);
         map[16] = TYPE_LOCALPLAYER;
         map[268] = TYPE_EXTERNPLAYER;
     } 
 }
 
 uint32_t Map::getCrateLayout(uint16_t seed, uint8_t layout){
-    uint16_t mask = (3 << layout*2);
-    if(((seed & mask) >> layout*2) == 0){
+    uint16_t mask = (3 << layout);
+    if(((seed & mask) >> layout) == 0){
         return LAYOUT_CRATES_0;
-    }else if(((seed & mask)) >> layout*2 == 1){
+    }else if(((seed & mask)) >> layout == 1){
         return LAYOUT_CRATES_1;        
-    }else if(((seed & mask)) >> layout*2 == 2){
+    }else if(((seed & mask)) >> layout == 2){
         return LAYOUT_CRATES_2;
-    }else if(((seed & mask)) >> layout*2 == 3){
+    }else if(((seed & mask)) >> layout == 3){
         return LAYOUT_CRATES_3;
     }
 }
@@ -43,58 +43,58 @@ layoutPart_t Map::createLayoutPart(uint16_t leftTop, uint16_t rightBottom, uint3
 }
 
 layout_t Map::createLayout(uint16_t seed){
-    uint16_t mask = (3 << 14);
+    uint16_t mask = (3 << SEED_MASK_LAYOUT);
     layout_t temp;
-    uint16_t a[14];
+    uint16_t a[PART_CORNER_COUNT];
 
-    if(((seed & mask) >> 14) == 0){
+    if(((seed & mask) >> SEED_MASK_LAYOUT) == 0){
         uint16_t tempje[] = {LAYOUT_FREEZONE_0};        // Kan dit korter?
         for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
             temp.freezone[i] = tempje[i];
         }
         uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
-        for(int i = 0; i<14; i++){
+        for(int i = 0; i<PART_CORNER_COUNT; i++){
             a[i] = tempje2[i];
         }
-    }else if(((seed & mask)) >> 14 == 1){
+    }else if(((seed & mask)) >> SEED_MASK_LAYOUT == 1){
         uint16_t tempje[] = {LAYOUT_FREEZONE_1};        // Kan dit korter?
         for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
             temp.freezone[i] = tempje[i];
         }
         uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
-        for(int i = 0; i<14; i++){
+        for(int i = 0; i<PART_CORNER_COUNT; i++){
             a[i] = tempje2[i];
         }
-    }else if(((seed & mask)) >> 14 == 2){
+    }else if(((seed & mask)) >> SEED_MASK_LAYOUT == 2){
         uint16_t tempje[] = {LAYOUT_FREEZONE_2};        // Kan dit korter?
         for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
             temp.freezone[i] = tempje[i];
         }
         uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
-        for(int i = 0; i<14; i++){
+        for(int i = 0; i<PART_CORNER_COUNT; i++){
             a[i] = tempje2[i];
         }
-    }else if(((seed & mask)) >> 14 == 3){
+    }else if(((seed & mask)) >> SEED_MASK_LAYOUT == 3){
         uint16_t tempje[] = {LAYOUT_FREEZONE_3};        // Kan dit korter?
         for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
             temp.freezone[i] = tempje[i];
         }
         uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
-        for(int i = 0; i<14; i++){
+        for(int i = 0; i<PART_CORNER_COUNT; i++){
             a[i] = tempje2[i];
         }
     }
 
-    layoutPart_t layoutA = createLayoutPart(a[0], a[1], getCrateLayout(seed, 0));
-    layoutPart_t layoutB = createLayoutPart(a[2], a[3], getCrateLayout(seed, 1));
-    layoutPart_t layoutC = createLayoutPart(a[4], a[5], getCrateLayout(seed, 2));
-    layoutPart_t layoutD = createLayoutPart(a[6], a[7], getCrateLayout(seed, 3));
-    layoutPart_t layoutE = createLayoutPart(a[8], a[9], getCrateLayout(seed, 4));
-    layoutPart_t layoutF = createLayoutPart(a[10], a[11], getCrateLayout(seed, 5));
-    layoutPart_t layoutG = createLayoutPart(a[12], a[13], getCrateLayout(seed, 6));
+    layoutPart_t layoutA = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_A], a[LAYOUT_LOWERRIGHT_CORNER_PART_A], getCrateLayout(seed, SEED_MASK_PART_A));
+    layoutPart_t layoutB = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_B], a[LAYOUT_LOWERRIGHT_CORNER_PART_B], getCrateLayout(seed, SEED_MASK_PART_B));
+    layoutPart_t layoutC = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_C], a[LAYOUT_LOWERRIGHT_CORNER_PART_C], getCrateLayout(seed, SEED_MASK_PART_C));
+    layoutPart_t layoutD = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_D], a[LAYOUT_LOWERRIGHT_CORNER_PART_D], getCrateLayout(seed, SEED_MASK_PART_D));
+    layoutPart_t layoutE = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_E], a[LAYOUT_LOWERRIGHT_CORNER_PART_E], getCrateLayout(seed, SEED_MASK_PART_E));
+    layoutPart_t layoutF = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_F], a[LAYOUT_LOWERRIGHT_CORNER_PART_F], getCrateLayout(seed, SEED_MASK_PART_F));
+    layoutPart_t layoutG = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_G], a[LAYOUT_LOWERRIGHT_CORNER_PART_G], getCrateLayout(seed, SEED_MASK_PART_G));
     
     layoutPart_t layoutParts[] = {layoutA, layoutB, layoutC, layoutD, layoutE, layoutF, layoutG};
-    for(int i = 0; i<7; i++){
+    for(int i = 0; i<PART_COUNT; i++){
         temp.parts[i] = layoutParts[i];
     }
     return temp;
