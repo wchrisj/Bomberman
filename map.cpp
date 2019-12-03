@@ -7,12 +7,8 @@ void Map::createMap(uint16_t seed){
   
     for(int place = 0; place<285; place++){
         for(uint8_t partCounter = 0; partCounter<7; partCounter++){
-            if(int result = fillPart(&layout.parts[partCounter], place)){
-                if(result == 1){
-                    map[place] = 0;
-                }else{
-                    map[place] = TYPE_CRATE;
-                }
+            if(fillPart(&layout.parts[partCounter], place)){
+                map[place] = TYPE_CRATE;
             }
         }
         if(cellIs(layout.freezone, sizeof(layout.freezone), place)){
@@ -47,22 +43,59 @@ layoutPart_t Map::createLayoutPart(uint16_t leftTop, uint16_t rightBottom, uint3
 }
 
 layout_t Map::createLayout(uint16_t seed){
-    layoutPart_t layoutA = createLayoutPart(19, 58, getCrateLayout(seed, 0));
-    layoutPart_t layoutB = createLayoutPart(64, 103, getCrateLayout(seed, 1));
-    layoutPart_t layoutC = createLayoutPart(109, 148, getCrateLayout(seed, 2));
-    layoutPart_t layoutD = createLayoutPart(154, 193, getCrateLayout(seed, 3));
-    layoutPart_t layoutE = createLayoutPart(226, 265, getCrateLayout(seed, 4));
-    layoutPart_t layoutF = createLayoutPart(61, 183, getCrateLayout(seed, 5));
-    layoutPart_t layoutG = createLayoutPart(196, 223, getCrateLayout(seed, 6));
+    uint16_t mask = (3 << 14);
+    layout_t temp;
+    uint16_t a[14];
+
+    if(((seed & mask) >> 14) == 0){
+        uint16_t tempje[] = {LAYOUT_FREEZONE_0};        // Kan dit korter?
+        for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
+            temp.freezone[i] = tempje[i];
+        }
+        uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
+        for(int i = 0; i<14; i++){
+            a[i] = tempje2[i];
+        }
+    }else if(((seed & mask)) >> 14 == 1){
+        uint16_t tempje[] = {LAYOUT_FREEZONE_1};        // Kan dit korter?
+        for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
+            temp.freezone[i] = tempje[i];
+        }
+        uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
+        for(int i = 0; i<14; i++){
+            a[i] = tempje2[i];
+        }
+    }else if(((seed & mask)) >> 14 == 2){
+        uint16_t tempje[] = {LAYOUT_FREEZONE_2};        // Kan dit korter?
+        for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
+            temp.freezone[i] = tempje[i];
+        }
+        uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
+        for(int i = 0; i<14; i++){
+            a[i] = tempje2[i];
+        }
+    }else if(((seed & mask)) >> 14 == 3){
+        uint16_t tempje[] = {LAYOUT_FREEZONE_3};        // Kan dit korter?
+        for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
+            temp.freezone[i] = tempje[i];
+        }
+        uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
+        for(int i = 0; i<14; i++){
+            a[i] = tempje2[i];
+        }
+    }
+
+    layoutPart_t layoutA = createLayoutPart(a[0], a[1], getCrateLayout(seed, 0));
+    layoutPart_t layoutB = createLayoutPart(a[2], a[3], getCrateLayout(seed, 1));
+    layoutPart_t layoutC = createLayoutPart(a[4], a[5], getCrateLayout(seed, 2));
+    layoutPart_t layoutD = createLayoutPart(a[6], a[7], getCrateLayout(seed, 3));
+    layoutPart_t layoutE = createLayoutPart(a[8], a[9], getCrateLayout(seed, 4));
+    layoutPart_t layoutF = createLayoutPart(a[10], a[11], getCrateLayout(seed, 5));
+    layoutPart_t layoutG = createLayoutPart(a[12], a[13], getCrateLayout(seed, 6));
     
     layoutPart_t layoutParts[] = {layoutA, layoutB, layoutC, layoutD, layoutE, layoutF, layoutG};
-    layout_t temp;
     for(int i = 0; i<7; i++){
         temp.parts[i] = layoutParts[i];
-    }
-    uint16_t tempje[] = {LAYOUT_FREEZONE_0};        // Kan dit korter?
-    for(int i = 0; i<16; i++){
-        temp.freezone[i] = tempje[i];
     }
     return temp;
 }
@@ -87,14 +120,14 @@ uint8_t Map::fillPart(layoutPart_t *layout, uint16_t place){
     for(uint16_t i = layout->leftTop; i<= layout->rightBottom; i++){ 
         if(place == i){
             if(layout->leftTop % 15 > i % 15 || layout->rightBottom % 15 < i % 15){
-                return 0;
+                return 0;   // Deze plek ligt niet in het goede gebied
             }
             if(layout->crates & ((uint32_t)1 << layout->counter)){
                 layout->counter++;
-                return 2;
+                return 1;   // Het is een plek in het goede gebieden en hier ligt een crate
             }
             layout->counter++;
-            return 1;
+            return 0; // Het is een plek in het goede gebied, hier ligt alleen geen crate
         }
     }
     return 0;

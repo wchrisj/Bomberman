@@ -3,18 +3,26 @@
 
 #include <stdint.h>
 
-#define FREEZONE_PLACES_COUNT 16 // 2 freezones, 8 plekken per freezone
+#define FREEZONE_PLACES_COUNT 18 // 2 freezones, 9 plekken per freezone
 #define PART_COUNT 7 // Er zijn 7 gebieden
 #define MAP_SIZE 285 // 15*19
 
-#define LAYOUT_CRATES_0 0x4147221
+#define LAYOUT_CRATES_0 0x4147221   // Hoe leg ik dit uit?
 #define LAYOUT_CRATES_1 0x8A27B07
 #define LAYOUT_CRATES_2 0x2FA630A0
 #define LAYOUT_CRATES_3 0x4A25382
 
-#define LAYOUT_FREEZONE_0 16,17,18,31,33,46,47,48,236,237,238,251,253,266,267,268
+#define LAYOUT_FREEZONE_0 16,17,18,31,32,33,46,47,48,236,237,238,251,252,253,266,267,268   // De plekken waar geen crates mogen spawnen, moet FREEZONE_PLACES_COUNT aantal plekken bevatten
+#define LAYOUT_FREEZONE_1 26,27,28,41,42,43,56,57,58,226,227,228,241,242,243,256,257,258 
+#define LAYOUT_FREEZONE_2 121,122,123,136,137,138,151,152,153,131,132,133,146,147,148,161,162,163 
+#define LAYOUT_FREEZONE_3 21,22,23,36,37,38,51,52,53,231,232,233,246,247,248,261,262,263 
 
-#define TYPE_AIR 0
+#define LAYOUT_0 19, 58, 64, 103, 109, 148, 154, 193, 226, 265, 61, 183, 196, 223   // Dit zijn de linkerbovenhoek en de rechteronderhoek van alle 7 gebieden in de verschillende layouts
+#define LAYOUT_1 16, 55, 61, 100, 106, 145, 151, 190, 229, 268, 71, 193, 196, 223
+#define LAYOUT_2 16, 109, 20, 114, 25, 118, 124, 160, 166, 259, 170, 164, 175, 168 
+#define LAYOUT_3 16, 95, 106, 170, 181, 260, 66, 218, 24, 103, 114, 178, 189, 168
+
+#define TYPE_AIR 0              // Types objecten die in het speelveld kunnen liggen
 #define TYPE_WALL 1
 #define TYPE_CRATE 2
 #define TYPE_BOMB 3
