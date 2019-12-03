@@ -36,7 +36,6 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	}
 	if(C_charMove == CHARACTER_MOVE) { //200ms
 		C_charMove = 0;
-		Serial.println("boop");
 		if (nunchuk->status.UP == 1) {
 			character->move(Character::UP);
 			Serial.println("UP");
@@ -79,9 +78,8 @@ int main (void)
 	tft.begin();
 	LCD lcd = LCD();
 	lcd.drawMap();
-	character->init(0, 0, 16, 16, ILI9341_YELLOW);
+	character->init(16, 16, ILI9341_YELLOW);
 	gameTimerInit();
-
 	while (1)
 	{
 		//Wire van nunchuk gebruikt een ISR. ISR in ISR mag niet.
@@ -111,12 +109,12 @@ void gameTimerInit() {
 
 void draw() {
 	if((character->prevX != character->x) || (character->prevY != character->y)) {	
-		tft.fillRect(character->prevY, character->prevX, character->height, character->width, ILI9341_BLACK);
+		tft.fillRect(character->prevX, character->prevY, character->height, character->width, ILI9341_BLACK);
 	}
-	tft.fillRect(character->y, character->x, character->height, character->width, ILI9341_YELLOW);
+	tft.fillRect(character->x, character->y, character->height, character->width, ILI9341_YELLOW);
 	if(bombs[0].exists == true) {
-		tft.fillRect(bombs[0].bombY, bombs[0].bombX, character->height, character->width, ILI9341_RED);
+		tft.fillRect(bombs[0].bombX, bombs[0].bombY, character->height, character->width, ILI9341_RED);
 	} else {
-		tft.fillRect(bombs[0].bombY, bombs[0].bombX, character->height, character->width, ILI9341_BLACK);
+		tft.fillRect(bombs[0].bombX, bombs[0].bombY, character->height, character->width, ILI9341_BLACK);
 	}
 }
