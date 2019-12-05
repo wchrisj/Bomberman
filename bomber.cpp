@@ -80,33 +80,32 @@ int main (void)
 	sei();
 	_delay_ms(50);
 	Serial.begin(9600);
-	//tft.begin();
 	LCD lcd = LCD();
 
 	Serial.print(F("Initializing SD card..."));
-	if(!SD.begin(SD_CS)) {
-    	Serial.println(F("failed!")); //ffail detection werkt niet
-    	for(;;); // Loop here forever
-	}
+	SD.begin(SD_CS); //als niet lukt loopt die vast, fail detection werkt toch niet
 	Serial.println(F("OK!"));
 
 	lcd.drawMap();
-	lcd.statusBar();
+	lcd.drawStatusBar();
 	// dit uiteindelijk allemaal in LCD
-	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 1+8, LENGTH - BLOCK_SIZE); //tekent ❤️
-	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 2+10, LENGTH - BLOCK_SIZE);
-	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 3+12, LENGTH - BLOCK_SIZE);
-	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 7+8, LENGTH - BLOCK_SIZE);
-	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 8+10, LENGTH - BLOCK_SIZE);
-	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 9+12, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 2, LENGTH - BLOCK_SIZE); //tekent ❤️
+	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 3, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 4, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 8, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 9, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 10, LENGTH - BLOCK_SIZE);
+
+	_delay_ms(1000);
+	lcd.updateLives(5);
 
 	character->init(0, 0, 16, 16, ILI9341_YELLOW);
 	gameTimerInit();
 
 	while (1)
 	{
-		//Wire van nunchuk gebruikt een ISR. ISR in ISR mag niet.
-		//Vandaar een handmatige flag zodat het wel kan.
+		// Wire van nunchuk gebruikt een ISR. ISR in ISR mag niet.
+		// Vandaar een handmatige flag zodat het wel kan.
 		if (F_readNunchuk == 1) {
 			F_readNunchuk = 0;
 			nunchuk->nunchuk_get();

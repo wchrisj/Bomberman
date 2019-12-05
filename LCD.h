@@ -21,7 +21,8 @@ class LCD {
         LCD();
         void drawWall(uint8_t x, uint8_t y);
         void drawMap();
-        void statusBar();
+        void drawStatusBar();
+        void updateLives(uint8_t p);
     
     private:
 };

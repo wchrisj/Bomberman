@@ -38,7 +38,7 @@ void LCD::drawMap(){
     drawWall((WIDTH / BLOCK_SIZE) - 1, i);              // └─x
   }
 
-  // teken de losse BLOCK_SIZEken in het midden
+  // teken de losse muur stukken in het midden
   for (int i = 2; i < (LENGTH / BLOCK_SIZE) - 2; i += 2) {
     for (int k = 2; k < (WIDTH / BLOCK_SIZE) - 2; k += 2) {
       drawWall(k, i); // teken muur
@@ -46,7 +46,7 @@ void LCD::drawMap(){
   }
 }
 
-void LCD::statusBar(){
+void LCD::drawStatusBar(){
   tft.fillRect(0, LENGTH - BLOCK_SIZE, WIDTH, BLOCK_SIZE, ILI9341_BLACK);
   tft.setCursor(0, LENGTH - BLOCK_SIZE +2);
   tft.setTextColor(ILI9341_BLUE);  tft.setTextSize(2);
@@ -54,4 +54,10 @@ void LCD::statusBar(){
   tft.setTextColor(ILI9341_YELLOW);
   tft.setCursor(BLOCK_SIZE * 6, LENGTH - BLOCK_SIZE +2);
   tft.print("P2");
+}
+
+// DEZE FUNCTIE MOET NOG VERDER WORDEN UITGEWERKT
+// uint8_t p geeft de player aan
+void LCD::updateLives(uint8_t p){
+  tft.fillRect(BLOCK_SIZE * 2, LENGTH - BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, ILI9341_BLACK);
 }
