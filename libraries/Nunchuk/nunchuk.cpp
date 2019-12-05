@@ -11,6 +11,7 @@
 #define LESS_THAN 64
 #define NEUTRAL 128
 #define MORE_THAN 192
+#define NUNCHUK_BYTES
 
 NunchukInput* NunchukInput::instance = 0;
 
@@ -36,12 +37,13 @@ NunchukInput::input status;
 void NunchukInput::nunchuk_get() {
 	Wire.beginTransmission(NUNCHUK_ADDR);
 	//6 bytes opvragen van de nunchuk
-	Wire.requestFrom(NUNCHUK_ADDR, 6);
+	Wire.requestFrom(NUNCHUK_ADDR, NUNCHUK_BYTES);
 	//Data opslaan
 	if (Wire.available()) {
 		for (uint8_t i = 0; i < 6 && Wire.available(); i++) {
 			nunchuk_data[i] = Wire.read();
 		}
+		//0x00 maakt de buffer schoon voor de volgende bytes
 		Wire.write(0x00);
 		Wire.endTransmission(true);
 		processNunchukData();
@@ -59,13 +61,11 @@ void NunchukInput::processNunchukData() {
 	else if (nunchuk_data[0] >= MORE_THAN) {
 		status.RIGHT = 1;
 		status.LEFT = 0;
-		Serial.println("RIGHT");
 	}
 	//Thumbstick naar links
 	else if (nunchuk_data[0] <= LESS_THAN) {
 		status.RIGHT = 0;
 		status.LEFT = 1;
-		Serial.println("LEFT");
 	}
 
 	//Neutrale Y positie
@@ -77,13 +77,11 @@ void NunchukInput::processNunchukData() {
 	else if (nunchuk_data[1] >= MORE_THAN) {
 		status.UP = 1;
 		status.DOWN = 0;
-		Serial.println("UP");
 	}
 	//Thumbstick naar onderen
 	else if (nunchuk_data[1] <= LESS_THAN) {
 		status.UP = 0;
 		status.DOWN = 1;
-		Serial.println("DOWN");
 	}
 
 	//Knop Z&C zijn niet ingedrukt
@@ -95,18 +93,15 @@ void NunchukInput::processNunchukData() {
 	else if (nunchuk_data[5] == 2) {
 		status.Z = 1;
 		status.C = 0;
-		Serial.println("Z");
 	}
 	//Knop C is ingedrukt
 	else if (nunchuk_data[5] == 1) {
 		status.Z = 0;
 		status.C = 1;
-		Serial.println("C");
 	}
 	//Knop Z&C zijn beiden ingedrukt
 	else if (nunchuk_data[5] == 0) {
 		status.Z = 1;
 		status.C = 1;
-		Serial.println("Z & C");
 	}
 }

@@ -1,8 +1,5 @@
 #include "LCD.h"
-
-
-
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+#include "bomber.h"
 
 LCD::LCD() {
     tft.begin();
