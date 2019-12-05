@@ -148,7 +148,7 @@ void Map::createWalls(int width, int height){
 uint8_t Map::placeCrates(layoutPart_t *layout, uint16_t place){
     for(uint16_t i = layout->leftTop; i<= layout->rightBottom; i++){ 
         if(place == i){
-            if(layout->leftTop % 15 > i % 15 || layout->rightBottom % 15 < i % 15){
+            if(layout->leftTop % MAP_WIDTH > i % MAP_WIDTH || layout->rightBottom % MAP_WIDTH < i % MAP_WIDTH){
                 return 0;   // Deze plek ligt niet in het goede gebied
             }
             if(layout->crates & ((uint32_t)1 << layout->counter)){
