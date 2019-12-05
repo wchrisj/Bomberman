@@ -15,10 +15,10 @@
 #define WIDTH 240
 
 #define P2_STATUS_LOCATION 6        // plek waar "P2" op de statusbar komt te staan
-
 #define BG_COLOR 0x2184             // background color
 #define P1_COLOR ILI9341_BLUE       // kleur van "P1" text op statusbar
 #define P2_COLOR ILI9341_YELLOW     // kleur van "P2" text op statusbar
+#define STATUSBAR_TEXT_SIZE 2       // text grote op statusbar
 
 class LCD {
     public:

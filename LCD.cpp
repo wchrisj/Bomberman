@@ -52,11 +52,11 @@ void LCD::drawBaseMap(){
 void LCD::drawStatusBar(){
   tft.fillRect(0, LENGTH - BLOCK_SIZE, WIDTH, BLOCK_SIZE, ILI9341_BLACK);
   tft.setCursor(0, LENGTH - BLOCK_SIZE +2);
-  tft.setTextColor(P1_COLOR);  tft.setTextSize(2);
-  tft.print("P1");
+  tft.setTextColor(P1_COLOR);  tft.setTextSize(STATUSBAR_TEXT_SIZE);
+  tft.print(F("P1"));
   tft.setTextColor(P2_COLOR);
   tft.setCursor(BLOCK_SIZE * P2_STATUS_LOCATION, LENGTH - BLOCK_SIZE + 2);
-  tft.print("P2");
+  tft.print(F("P2"));
 }
 
 // DEZE FUNCTIE MOET NOG VERDER WORDEN UITGEWERKT
