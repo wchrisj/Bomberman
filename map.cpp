@@ -15,8 +15,8 @@ void Map::createMap(uint16_t seed){
             map[place] = TYPE_AIR; // Freezone
         }
         createWalls(MAP_WIDTH, MAP_HEIGHT);
-        map[16] = TYPE_LOCALPLAYER;
-        map[268] = TYPE_EXTERNPLAYER;
+        map[layout.spawnPlayer1] = TYPE_LOCALPLAYER;
+        map[layout.spawnPlayer2] = TYPE_EXTERNPLAYER;
     } 
 }
 
@@ -56,6 +56,8 @@ layout_t Map::createLayout(uint16_t seed){
         for(int i = 0; i<PART_CORNER_COUNT; i++){
             a[i] = tempje2[i];
         }
+        temp.spawnPlayer1 = LAYOUT_0_SPAWN_1;           // Zet de spawn punten
+        temp.spawnPlayer2 = LAYOUT_0_SPAWN_2;
     }else if(((seed & mask)) >> SEED_MASK_LAYOUT == 1){
         uint16_t tempje[] = {LAYOUT_FREEZONE_1};        // Kan dit korter?
         for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
@@ -65,6 +67,8 @@ layout_t Map::createLayout(uint16_t seed){
         for(int i = 0; i<PART_CORNER_COUNT; i++){
             a[i] = tempje2[i];
         }
+        temp.spawnPlayer1 = LAYOUT_1_SPAWN_1;           // Zet de spawn punten
+        temp.spawnPlayer2 = LAYOUT_1_SPAWN_2;
     }else if(((seed & mask)) >> SEED_MASK_LAYOUT == 2){
         uint16_t tempje[] = {LAYOUT_FREEZONE_2};        // Kan dit korter?
         for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
@@ -74,6 +78,8 @@ layout_t Map::createLayout(uint16_t seed){
         for(int i = 0; i<PART_CORNER_COUNT; i++){
             a[i] = tempje2[i];
         }
+        temp.spawnPlayer1 = LAYOUT_2_SPAWN_1;           // Zet de spawn punten
+        temp.spawnPlayer2 = LAYOUT_2_SPAWN_2;
     }else if(((seed & mask)) >> SEED_MASK_LAYOUT == 3){
         uint16_t tempje[] = {LAYOUT_FREEZONE_3};        // Kan dit korter?
         for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
@@ -83,6 +89,8 @@ layout_t Map::createLayout(uint16_t seed){
         for(int i = 0; i<PART_CORNER_COUNT; i++){
             a[i] = tempje2[i];
         }
+        temp.spawnPlayer1 = LAYOUT_3_SPAWN_1;           // Zet de spawn punten
+        temp.spawnPlayer2 = LAYOUT_3_SPAWN_2;
     }
 
     layoutPart_t layoutA = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_A], a[LAYOUT_LOWERRIGHT_CORNER_PART_A], getCrateLayout(seed, SEED_MASK_PART_A));

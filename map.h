@@ -49,6 +49,15 @@
 #define LAYOUT_2 16, 109, 20, 114, 25, 118, 124, 160, 166, 259, 170, 164, 175, 168 
 #define LAYOUT_3 16, 95, 106, 170, 181, 260, 66, 218, 24, 103, 114, 178, 189, 168
 
+#define LAYOUT_0_SPAWN_1 16     // De plekken waar de players beginnen
+#define LAYOUT_0_SPAWN_2 268
+#define LAYOUT_1_SPAWN_1 28
+#define LAYOUT_1_SPAWN_2 256
+#define LAYOUT_2_SPAWN_1 136 
+#define LAYOUT_2_SPAWN_2 148
+#define LAYOUT_3_SPAWN_1 22
+#define LAYOUT_3_SPAWN_2 262
+
 #define TYPE_AIR 0              // Types objecten die in het speelveld kunnen liggen
 #define TYPE_WALL 1
 #define TYPE_CRATE 2
@@ -69,6 +78,8 @@ typedef
   struct{
       uint16_t freezone[FREEZONE_PLACES_COUNT];     // Wat zijn de freezone punten
       layoutPart_t parts[PART_COUNT];               // Waar liggen de verschillende gebieden
+      uint16_t spawnPlayer1;                        // Hier begint player 1
+      uint16_t spawnPlayer2;                        // Hier begint player 2
   }
 layout_t;
 
