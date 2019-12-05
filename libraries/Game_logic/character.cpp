@@ -45,10 +45,10 @@ void Character::init(int _height, int _width, uint16_t _color) {
 //Daarna wordt de huidige positie zwart getekend.
 //En als laatste wordt de nieuwe locatie van de speler getekend.
 void Character::move(Direction dir) {
+	prevY = y;
+	prevX = x;
 	if (dir == Character::UP) {
-		if ((y - height) > -1 && collision(Character::UP)) {
-			prevY = y;
-			prevX = x;
+		if ((y - height) >= 0 && collision(Character::UP)) {
 			mapArr[convertPosition-MAP_WIDTH] = TYPE_LOCALPLAYER;
 			y -= height;
 			mapArr[convertPosition+MAP_WIDTH] = TYPE_AIR;
@@ -56,8 +56,6 @@ void Character::move(Direction dir) {
 	}
 	else if (dir == Character::RIGHT) {
 		if ((x + width) < MAP_MAX_WIDTH && collision(Character::RIGHT)) {
-			prevY = y;
-			prevX = x;
 			mapArr[convertPosition+1] = TYPE_LOCALPLAYER;
 			x += width;
 			mapArr[convertPosition-1] = TYPE_AIR;
@@ -65,17 +63,13 @@ void Character::move(Direction dir) {
 	}
 	else if (dir == Character::DOWN) {
 		if ((y + height) < MAP_MAX_HEIGHT && collision(Character::DOWN)) {
-			prevY = y;
-			prevX = x;
 			mapArr[convertPosition+MAP_WIDTH] = TYPE_LOCALPLAYER;
 			y += height;
 			mapArr[convertPosition-MAP_WIDTH] = TYPE_AIR;
 		}
 	}
 	else if (dir == Character::LEFT) {
-		if ((x - width) > -1 && collision(Character::LEFT)) {
-			prevY = y;
-			prevX = x;
+		if ((x - width) >= 0 && collision(Character::LEFT)) {
 			mapArr[convertPosition-1] = TYPE_LOCALPLAYER;
 			x -= width;
 			mapArr[convertPosition+1] = TYPE_AIR;

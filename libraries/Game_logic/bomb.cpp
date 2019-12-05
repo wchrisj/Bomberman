@@ -4,8 +4,6 @@
 
 #include "../../bomber.h"
 
-Bomb::Bomb() {}
-
 //Update positie van de bom & zet de Flag voor de draw functie zodat die weet dat een bom wel/niet getekend moet worden
 void Bomb::placeBomb(int x, int y) {
 	bombX = x;

@@ -26,6 +26,10 @@ Character localCharacter;
 Character externCharacter;
 //Bomb bombs[1];
 
+//Game loop is 2 ms. Timer1 beheert dit.
+//Elke 2ms wordt de input van de nunchuk gelezen zodat de input vlot werkt en geen delays oplevert
+//Elke 200ms kan de character een stap zetten door de nunchuk uit te lezen
+//Elke 4000ms wordt er een bom ge-explodeerd indien er een bom aanwezig is
 ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	F_readNunchuk = 1;
 	C_charMove++;
@@ -35,7 +39,7 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	if(externCharacter.bomb.exists) {
 		C_bombs[1]++;
 	}
-	if(C_charMove == CHARACTER_MOVE) { //200ms
+	if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
 		C_charMove = 0;
 		if (nunchuk->status.UP == 1) {
 			localCharacter.move(Character::UP);
@@ -61,7 +65,7 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 		draw();
 	}
 
-	if (C_bombs[0] == BOMB_EXPLODE) { //12seconden
+	if (C_bombs[0] == BOMB_EXPLODE) { //4seconden
 		C_bombs[0] = 0;
 		localCharacter.bomb.explodeBomb();
 	}
@@ -74,7 +78,6 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 int main (void)
 {
 	sei();
-	_delay_ms(50);
 	Serial.begin(9600);
 	tft.begin();
 	LCD lcd = LCD();
@@ -94,17 +97,15 @@ int main (void)
 	return(0);
 }
 
+//Initalizeer timer1 voor de gameclock naar Compare A register elke 2ms
 void gameTimerInit() {
-	TCCR1A = 0; // set entire TCCR1A register to 0
-	TCCR1B = 0; // same for TCCR1B
-	TCNT1 = 0; // initialize counter value to 0
-	// set compare match register for 500 Hz increments
-	OCR1A = 31999; // = 16000000 / (1 * 500) - 1 (must be <65536) 500hz 2ms
-	// turn on CTC mode
+	TCCR1A = 0;
+	TCCR1B = 0;
+	TCNT1 = 0;
+	// compare match register A op 500hz zetten, aka 2ms.
+	OCR1A = 31999;
 	TCCR1B |= (1 << WGM12);
-	// Set CS12, CS11 and CS10 bits for 1 prescaler
 	TCCR1B |= (0 << CS12) | (0 << CS11) | (1 << CS10);
-	// enable timer compare interrupt
 	TIMSK1 |= (1 << OCIE1A);
 }
 

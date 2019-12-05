@@ -3,7 +3,6 @@
 
 class Bomb {
 public:
-	Bomb();
 	int bombX, bombY;
 	void placeBomb(int x, int y);
 	void explodeBomb();
