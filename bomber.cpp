@@ -83,10 +83,10 @@ int main (void)
 	LCD lcd = LCD();
 
 	Serial.print(F("Initializing SD card..."));
-	SD.begin(SD_CS); //als niet lukt loopt die vast, fail detection werkt toch niet
+	SD.begin(SD_CS); //als niet lukt loopt die vast, fail detection van lib werkt niet
 	Serial.println(F("OK!"));
 
-	lcd.drawMap();
+	lcd.drawBaseMap();
 	lcd.drawStatusBar();
 	// dit uiteindelijk allemaal in LCD
 	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 2, LENGTH - BLOCK_SIZE); //tekent ❤️

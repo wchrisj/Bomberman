@@ -14,13 +14,17 @@
 #define LENGTH 320
 #define WIDTH 240
 
-#define BG_COLOR 0x2184 // background color
+#define P2_STATUS_LOCATION 6        // plek waar "P2" op de statusbar komt te staan
+
+#define BG_COLOR 0x2184             // background color
+#define P1_COLOR ILI9341_BLUE       // kleur van "P1" text op statusbar
+#define P2_COLOR ILI9341_YELLOW     // kleur van "P2" text op statusbar
 
 class LCD {
     public:
         LCD();
         void drawWall(uint8_t x, uint8_t y);
-        void drawMap();
+        void drawBaseMap();
         void drawStatusBar();
         void updateLives(uint8_t p);
     
