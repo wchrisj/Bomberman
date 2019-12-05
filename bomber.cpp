@@ -89,12 +89,12 @@ int main (void)
 	lcd.drawBaseMap();
 	lcd.drawStatusBar();
 	// dit uiteindelijk allemaal in LCD
-	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 2, LENGTH - BLOCK_SIZE); //tekent ❤️
-	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 3, LENGTH - BLOCK_SIZE);
-	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 4, LENGTH - BLOCK_SIZE);
-	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 8, LENGTH - BLOCK_SIZE);
-	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 9, LENGTH - BLOCK_SIZE);
-	reader.drawBMP("/h1.bmp", tft, BLOCK_SIZE * 10, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 2, LENGTH - BLOCK_SIZE); //tekent ❤️
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 3, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 4, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 8, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 9, LENGTH - BLOCK_SIZE);
+	reader.drawBMP("/h.bmp", tft, BLOCK_SIZE * 10, LENGTH - BLOCK_SIZE);
 
 	_delay_ms(1000);
 	lcd.updateLives(5);
