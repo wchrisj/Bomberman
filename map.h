@@ -93,8 +93,7 @@ class Map{
         layoutPart_t createLayoutPart(uint16_t leftTop, uint16_t rightBottom, uint32_t crates);
         layout_t createLayout(uint16_t seed);
         void createWalls(int width, int height);
-        uint8_t fillPart(layoutPart_t *layout, uint16_t place);
-        uint8_t cellIs(uint16_t input[], uint8_t size, uint16_t place);
+        uint8_t placeCrates(layoutPart_t *layout, uint16_t place);
 };
 
 #endif
