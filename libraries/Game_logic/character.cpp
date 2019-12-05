@@ -4,7 +4,7 @@
 
 #include "../../bomber.h"
 
-#define convertPosition (x/16)+(y/16)*15
+#define convertPosition (x/16)+(y/16)*15	//Ruwe positie bijv 160x160 omzetten naar een positie in de map array
 
 #define TYPE_AIR 0              // Types objecten die in het speelveld kunnen liggen
 #define TYPE_WALL 1
@@ -13,22 +13,19 @@
 #define TYPE_LOCALPLAYER 4
 #define TYPE_EXTERNPLAYER 5
 
-int mapArr[285] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,};
-Character* Character::instance = 0;
+#define MAP_SIZE 285
+#define MAP_MAX_WIDTH 240
+#define MAP_MAX_HEIGHT 320
+#define MAP_WIDTH 15
+
+int mapArr[MAP_SIZE] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 
 Character::Character() {}
-
-Character* Character::getInstance() {
-	if (instance == 0) {
-		instance = new Character();
-	}
-	return instance;
-}
 
 //Maakt de character zichtbaar op het scherm.
 void Character::init(int _height, int _width, uint16_t _color) {
 	for(int i = 0; i < 285; i++) {
-		if(mapArr[i] == 4) {
+		if(mapArr[i] == TYPE_LOCALPLAYER) {
 			Serial.println(i);
 			x = i;
 			y = i;
@@ -52,13 +49,13 @@ void Character::move(Direction dir) {
 		if ((y - height) > -1 && collision(Character::UP)) {
 			prevY = y;
 			prevX = x;
-			mapArr[convertPosition-15] = TYPE_LOCALPLAYER;
+			mapArr[convertPosition-MAP_WIDTH] = TYPE_LOCALPLAYER;
 			y -= height;
-			mapArr[convertPosition+15] = TYPE_AIR;
+			mapArr[convertPosition+MAP_WIDTH] = TYPE_AIR;
 		}
 	}
 	else if (dir == Character::RIGHT) {
-		if ((x + width) < 240 && collision(Character::RIGHT)) {
+		if ((x + width) < MAP_MAX_WIDTH && collision(Character::RIGHT)) {
 			prevY = y;
 			prevX = x;
 			mapArr[convertPosition+1] = TYPE_LOCALPLAYER;
@@ -67,12 +64,12 @@ void Character::move(Direction dir) {
 		}
 	}
 	else if (dir == Character::DOWN) {
-		if ((y + height) < 320 && collision(Character::DOWN)) {
+		if ((y + height) < MAP_MAX_HEIGHT && collision(Character::DOWN)) {
 			prevY = y;
 			prevX = x;
-			mapArr[convertPosition+15] = TYPE_LOCALPLAYER;
+			mapArr[convertPosition+MAP_WIDTH] = TYPE_LOCALPLAYER;
 			y += height;
-			mapArr[convertPosition-15] = TYPE_AIR;
+			mapArr[convertPosition-MAP_WIDTH] = TYPE_AIR;
 		}
 	}
 	else if (dir == Character::LEFT) {
@@ -90,7 +87,7 @@ void Character::move(Direction dir) {
 bool Character::collision(Direction dir) {
 	if (dir == Character::UP) {
 		//Check Up
-		int entity = mapArr[convertPosition-15];
+		int entity = mapArr[convertPosition-MAP_WIDTH];
 		if(entity == TYPE_AIR) {
 			Serial.println("air");
 			return true;
@@ -112,7 +109,7 @@ bool Character::collision(Direction dir) {
 	}
 	else if (dir == Character::DOWN) {
 		//Check Down
-		int entity = mapArr[convertPosition+15];
+		int entity = mapArr[convertPosition+MAP_WIDTH];
 		if(entity == TYPE_AIR) {
 			Serial.println("air");
 			return true;

@@ -22,39 +22,40 @@ volatile int C_bombs[1];
 //https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 NunchukInput* nunchuk = NunchukInput::getInstance();
-Character* character = Character::getInstance();
-Bomb bombs[1];
+Character localCharacter;
+Character externCharacter;
+//Bomb bombs[1];
 
 ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	F_readNunchuk = 1;
 	C_charMove++;
-	if(bombs[0].exists) {
+	if(localCharacter.bomb.exists) {
 		C_bombs[0]++;
 	}
-	if(bombs[1].exists) {
+	if(externCharacter.bomb.exists) {
 		C_bombs[1]++;
 	}
 	if(C_charMove == CHARACTER_MOVE) { //200ms
 		C_charMove = 0;
 		if (nunchuk->status.UP == 1) {
-			character->move(Character::UP);
+			localCharacter.move(Character::UP);
 			Serial.println("UP");
 		}
 		else if (nunchuk->status.RIGHT == 1) {
-			character->move(Character::RIGHT);
+			localCharacter.move(Character::RIGHT);
 			Serial.println("RIGHT");
 		}
 		else if (nunchuk->status.DOWN == 1) {
-			character->move(Character::DOWN);
+			localCharacter.move(Character::DOWN);
 			Serial.println("DOWN");
 		}
 		else if (nunchuk->status.LEFT == 1) {
-			character->move(Character::LEFT);
+			localCharacter.move(Character::LEFT);
 			Serial.println("LEFT");
 		}
 		if (nunchuk->status.Z == 1) {
-			if(!bombs[0].exists) {
-				bombs[0].placeBomb();
+			if(!localCharacter.bomb.exists) {
+				localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
 			}
 		}
 		draw();
@@ -62,11 +63,11 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 
 	if (C_bombs[0] == BOMB_EXPLODE) { //12seconden
 		C_bombs[0] = 0;
-		bombs[0].explodeBomb();
+		localCharacter.bomb.explodeBomb();
 	}
 	if (C_bombs[1] == BOMB_EXPLODE) {
 		C_bombs[1] = 0;
-		bombs[1].explodeBomb();
+		externCharacter.bomb.explodeBomb();
 	}
 }
 
@@ -78,7 +79,7 @@ int main (void)
 	tft.begin();
 	LCD lcd = LCD();
 	lcd.drawMap();
-	character->init(16, 16, ILI9341_YELLOW);
+	localCharacter.init(16, 16, ILI9341_YELLOW);
 	gameTimerInit();
 	while (1)
 	{
@@ -108,13 +109,13 @@ void gameTimerInit() {
 }
 
 void draw() {
-	if((character->prevX != character->x) || (character->prevY != character->y)) {	
-		tft.fillRect(character->prevX, character->prevY, character->height, character->width, ILI9341_BLACK);
+	if((localCharacter.prevX != localCharacter.x) || (localCharacter.prevY != localCharacter.y)) {	
+		tft.fillRect(localCharacter.prevX, localCharacter.prevY, localCharacter.height, localCharacter.width, ILI9341_BLACK);
 	}
-	tft.fillRect(character->x, character->y, character->height, character->width, ILI9341_YELLOW);
-	if(bombs[0].exists == true) {
-		tft.fillRect(bombs[0].bombX, bombs[0].bombY, character->height, character->width, ILI9341_RED);
+	tft.fillRect(localCharacter.x, localCharacter.y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
+	if(localCharacter.bomb.exists == true) {
+		tft.fillRect(localCharacter.bomb.bombX, localCharacter.bomb.bombY, localCharacter.height, localCharacter.width, ILI9341_RED);
 	} else {
-		tft.fillRect(bombs[0].bombX, bombs[0].bombY, character->height, character->width, ILI9341_BLACK);
+		tft.fillRect(localCharacter.bomb.bombX, localCharacter.bomb.bombY, localCharacter.height, localCharacter.width, ILI9341_BLACK);
 	}
 }
