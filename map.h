@@ -94,6 +94,7 @@ class Map{
         layout_t createLayout(uint16_t seed);
         void createWalls(int width, int height);
         uint8_t placeCrates(layoutPart_t *layout, uint16_t place);
+        void getLayoutValues(layout_t *layout, uint16_t freezone[], uint16_t spawn1, uint16_t spawn2);
 };
 
 #endif

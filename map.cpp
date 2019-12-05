@@ -62,68 +62,63 @@ layoutPart_t Map::createLayoutPart(uint16_t leftTop, uint16_t rightBottom, uint3
 layout_t Map::createLayout(uint16_t seed){
     uint16_t mask = (3 << SEED_MASK_LAYOUT);    // Welke layout is gekozen?
     layout_t temp;                              // Hierin wordt de layout opgebouwd
-    uint16_t a[PART_CORNER_COUNT];              // Deze wordt gebruikt voor de hoeken van de gebieden
+    uint16_t partCorners[PART_CORNER_COUNT];             // Deze wordt gebruikt voor de hoeken van de gebieden
 
     if(((seed & mask) >> SEED_MASK_LAYOUT) == 0){       // Is het layout 0?
-        uint16_t tempje[] = {LAYOUT_FREEZONE_0};        // Kan dit korter?
-        for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){   // Hier wordt de freezone opgeslagen
-            temp.freezone[i] = tempje[i];
-        }
-        uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
+        uint16_t freezone[] = {LAYOUT_FREEZONE_0};
+        getLayoutValues(&temp, freezone, LAYOUT_0_SPAWN_1, LAYOUT_0_SPAWN_2);
+        uint16_t corners[] = {LAYOUT_0};                // Kan dit korter?
         for(int i = 0; i<PART_CORNER_COUNT; i++){       // Hier worden de hoeken van de gebieden opgeslagen
-            a[i] = tempje2[i];
+            partCorners[i] = corners[i];
         }
-        temp.spawnPlayer1 = LAYOUT_0_SPAWN_1;           // Zet de spawn punten
-        temp.spawnPlayer2 = LAYOUT_0_SPAWN_2;
     }else if(((seed & mask)) >> SEED_MASK_LAYOUT == 1){ // Is het layout 1?
-        uint16_t tempje[] = {LAYOUT_FREEZONE_1};        // Kan dit korter?
-        for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
-            temp.freezone[i] = tempje[i];
-        }
-        uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
+        uint16_t freezone[] = {LAYOUT_FREEZONE_1};
+        getLayoutValues(&temp, freezone, LAYOUT_1_SPAWN_1, LAYOUT_1_SPAWN_2);        
+        uint16_t corners[] = {LAYOUT_0};                // Kan dit korter?
         for(int i = 0; i<PART_CORNER_COUNT; i++){
-            a[i] = tempje2[i];
+            partCorners[i] = corners[i];
         }
-        temp.spawnPlayer1 = LAYOUT_1_SPAWN_1;           // Zet de spawn punten
-        temp.spawnPlayer2 = LAYOUT_1_SPAWN_2;
     }else if(((seed & mask)) >> SEED_MASK_LAYOUT == 2){ // Is het layout 2?
-        uint16_t tempje[] = {LAYOUT_FREEZONE_2};        // Kan dit korter?
-        for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
-            temp.freezone[i] = tempje[i];
-        }
-        uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
+        uint16_t freezone[] = {LAYOUT_FREEZONE_2};
+        getLayoutValues(&temp, freezone, LAYOUT_2_SPAWN_1, LAYOUT_2_SPAWN_2);    
+        uint16_t corners[] = {LAYOUT_0};                // Kan dit korter?
         for(int i = 0; i<PART_CORNER_COUNT; i++){
-            a[i] = tempje2[i];
+            partCorners[i] = corners[i];
         }
-        temp.spawnPlayer1 = LAYOUT_2_SPAWN_1;           // Zet de spawn punten
-        temp.spawnPlayer2 = LAYOUT_2_SPAWN_2;
     }else if(((seed & mask)) >> SEED_MASK_LAYOUT == 3){ // Is het layout 3?
-        uint16_t tempje[] = {LAYOUT_FREEZONE_3};        // Kan dit korter?
-        for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){
-            temp.freezone[i] = tempje[i];
-        }
-        uint16_t tempje2[] = {LAYOUT_0};                // Kan dit korter?
+        uint16_t freezone[] = {LAYOUT_FREEZONE_3};
+        getLayoutValues(&temp, freezone, LAYOUT_3_SPAWN_1, LAYOUT_3_SPAWN_2);    
+        uint16_t corners[] = {LAYOUT_0};                // Kan dit korter?
         for(int i = 0; i<PART_CORNER_COUNT; i++){
-            a[i] = tempje2[i];
+            partCorners[i] = corners[i];
         }
-        temp.spawnPlayer1 = LAYOUT_3_SPAWN_1;           // Zet de spawn punten
-        temp.spawnPlayer2 = LAYOUT_3_SPAWN_2;
     }
 
     // Hier worden de gebieden berekend
-    layoutPart_t layoutA = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_A], a[LAYOUT_LOWERRIGHT_CORNER_PART_A], getCrateLayout(seed, SEED_MASK_PART_A));
-    layoutPart_t layoutB = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_B], a[LAYOUT_LOWERRIGHT_CORNER_PART_B], getCrateLayout(seed, SEED_MASK_PART_B));
-    layoutPart_t layoutC = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_C], a[LAYOUT_LOWERRIGHT_CORNER_PART_C], getCrateLayout(seed, SEED_MASK_PART_C));
-    layoutPart_t layoutD = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_D], a[LAYOUT_LOWERRIGHT_CORNER_PART_D], getCrateLayout(seed, SEED_MASK_PART_D));
-    layoutPart_t layoutE = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_E], a[LAYOUT_LOWERRIGHT_CORNER_PART_E], getCrateLayout(seed, SEED_MASK_PART_E));
-    layoutPart_t layoutF = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_F], a[LAYOUT_LOWERRIGHT_CORNER_PART_F], getCrateLayout(seed, SEED_MASK_PART_F));
-    layoutPart_t layoutG = createLayoutPart(a[LAYOUT_UPPERLEFT_CORNER_PART_G], a[LAYOUT_LOWERRIGHT_CORNER_PART_G], getCrateLayout(seed, SEED_MASK_PART_G));
+    layoutPart_t layoutA = createLayoutPart(partCorners[LAYOUT_UPPERLEFT_CORNER_PART_A], partCorners[LAYOUT_LOWERRIGHT_CORNER_PART_A], getCrateLayout(seed, SEED_MASK_PART_A));
+    layoutPart_t layoutB = createLayoutPart(partCorners[LAYOUT_UPPERLEFT_CORNER_PART_B], partCorners[LAYOUT_LOWERRIGHT_CORNER_PART_B], getCrateLayout(seed, SEED_MASK_PART_B));
+    layoutPart_t layoutC = createLayoutPart(partCorners[LAYOUT_UPPERLEFT_CORNER_PART_C], partCorners[LAYOUT_LOWERRIGHT_CORNER_PART_C], getCrateLayout(seed, SEED_MASK_PART_C));
+    layoutPart_t layoutD = createLayoutPart(partCorners[LAYOUT_UPPERLEFT_CORNER_PART_D], partCorners[LAYOUT_LOWERRIGHT_CORNER_PART_D], getCrateLayout(seed, SEED_MASK_PART_D));
+    layoutPart_t layoutE = createLayoutPart(partCorners[LAYOUT_UPPERLEFT_CORNER_PART_E], partCorners[LAYOUT_LOWERRIGHT_CORNER_PART_E], getCrateLayout(seed, SEED_MASK_PART_E));
+    layoutPart_t layoutF = createLayoutPart(partCorners[LAYOUT_UPPERLEFT_CORNER_PART_F], partCorners[LAYOUT_LOWERRIGHT_CORNER_PART_F], getCrateLayout(seed, SEED_MASK_PART_F));
+    layoutPart_t layoutG = createLayoutPart(partCorners[LAYOUT_UPPERLEFT_CORNER_PART_G], partCorners[LAYOUT_LOWERRIGHT_CORNER_PART_G], getCrateLayout(seed, SEED_MASK_PART_G));
     
     layoutPart_t layoutParts[] = {layoutA, layoutB, layoutC, layoutD, layoutE, layoutF, layoutG};
     for(int i = 0; i<PART_COUNT; i++){  // Hier worden de gebieden opgeslagen
         temp.parts[i] = layoutParts[i];
     }
     return temp;
+}
+
+/*
+    Deze functie vult de freezones en spawnpoints voor de layouts in
+*/
+void Map::getLayoutValues(layout_t *layout, uint16_t freezone[], uint16_t spawn1, uint16_t spawn2){
+    for(int i = 0; i<FREEZONE_PLACES_COUNT; i++){   // Hier wordt de freezone opgeslagen
+        layout->freezone[i] = freezone[i];
+    }
+    layout->spawnPlayer1 = spawn1;        // Zet de spawn punten
+    layout->spawnPlayer2 = spawn2;
 }
 
 /*
