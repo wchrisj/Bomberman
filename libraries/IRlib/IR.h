@@ -13,6 +13,12 @@
 #define IDENTIFIER_MASK 0x03
 #define IDENTIFIER_LENGTH 2
 
+#define IDENTIFIER_MAP 0
+#define IDENTIFIER_START 1
+#define IDENTIFIER_PLAYER_LOC 0
+#define IDENTIFIER_BOM_LOC 2
+#define IDENTIFIER_PLAYER_DEAD 3
+
 #define USECPERTICK 50 // Hoeveel tijd zit er tussen de metingen?
 #define GAP_TICKS 100 // Hoeveel ticks mag het signaal achter elkaar LOW zijn, als er geen data verstuurt word is het signaal LOW
 #define MAX_ZERO_VALUE 900 // Wat is de hoogste waarde die een 0 mag hebben -> hoger is het een 1

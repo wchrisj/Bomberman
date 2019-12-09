@@ -15,10 +15,10 @@
 
 class LCD {
     public:
-        LCD();
-        void drawWall(uint8_t x, uint8_t y);
-        void drawMap();
-        void statusBar();
+        LCD(Adafruit_ILI9341 *tft);
+        void drawWall(Adafruit_ILI9341 *tft, uint8_t x, uint8_t y);
+        void drawMap(Adafruit_ILI9341 *tft);
+        void statusBar(Adafruit_ILI9341 *tft);
     
     private:
 };

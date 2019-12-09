@@ -17,11 +17,11 @@
 
 class Homepage {
     public:
-        Homepage();
-        void HomepageText();
+        Homepage(Adafruit_ILI9341 *tft);
+        void HomepageText(Adafruit_ILI9341 *tft);
         //void StartSending();
         void gameTimerInit();
-        void HomepageText2();
+        void HomepageText2(Adafruit_ILI9341 tft);
     private:
 };
 
