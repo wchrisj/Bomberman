@@ -1,17 +1,18 @@
-#ifndef CHARACTER_H
-#define CHARACTER_H
-#include "bomb.h"
+#ifndef CHARACTER.H
+#define CHARACTER.H
 class Character {
 public:
+	static Character* getInstance();
+
 	enum Direction { UP, RIGHT, DOWN, LEFT };
 	enum Direction direction;
 	int prevX, x, prevY, y, height, width;
 	uint16_t color;
-	Bomb bomb;
-	void init(int _height, int _width, uint16_t _color);
+	void init(int _y, int _x, int _height, int _width, uint16_t _color);
 	void move(Direction dir);
 	bool collision(Direction dir);
-	Character();
 private:
+	static Character* instance;
+	Character();
 };
 #endif
