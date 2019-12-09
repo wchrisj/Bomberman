@@ -26,6 +26,9 @@ Character localCharacter;
 Character externCharacter;
 Map mapGenerator;
 
+
+	LCD lcd = LCD();
+
 //Game loop is 2 ms. Timer1 beheert dit.
 //Elke 2ms wordt de input van de nunchuk gelezen zodat de input vlot werkt en geen delays oplevert
 //Elke 200ms kan de character een stap zetten door de nunchuk uit te lezen
@@ -79,11 +82,15 @@ int main (void)
 {
 	sei();
 	Serial.begin(9600);
-	tft.begin();
+	//tft.begin();
 	mapGenerator.createMap(0xFFFF); //Seed = 1
-	LCD lcd = LCD();
+	//LCD lcd = LCD();
 	lcd.drawMap();
 	localCharacter.init(16, 16, ILI9341_YELLOW);
+
+	lcd.drawPlayer(11, 15, 0x0526);
+	lcd.drawPlayer(12, 15, 0xF800);
+
 	gameTimerInit();
 	while (1)
 	{
@@ -112,12 +119,13 @@ void gameTimerInit() {
 
 void draw() {
 	if((localCharacter.prevX != localCharacter.x) || (localCharacter.prevY != localCharacter.y)) {	
-		tft.fillRect(localCharacter.prevX, localCharacter.prevY, localCharacter.height, localCharacter.width, ILI9341_BLACK);
+		lcd.drawAir(localCharacter.prevX, localCharacter.prevY);
 	}
-	tft.fillRect(localCharacter.x, localCharacter.y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
+	lcd.drawPlayer(localCharacter.x / 16, localCharacter.y / 16, 0x8810); // mss later eerst nieuwe tekenen en dan pas oude weghalen
+	//tft.fillRect(localCharacter.x, localCharacter.y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
 	if(localCharacter.bomb.exists == true) {
 		tft.fillRect(localCharacter.bomb.bombX, localCharacter.bomb.bombY, localCharacter.height, localCharacter.width, ILI9341_RED);
 	} else {
-		tft.fillRect(localCharacter.bomb.bombX, localCharacter.bomb.bombY, localCharacter.height, localCharacter.width, ILI9341_BLACK);
+		lcd.drawAir(localCharacter.bomb.bombX, localCharacter.bomb.bombY);
 	}
 }
