@@ -1,5 +1,5 @@
-#ifndef BOMB.H
-#define BOMB.H
+#ifndef BOMB_H
+#define BOMB_H
 
 class Bomb {
 public:
