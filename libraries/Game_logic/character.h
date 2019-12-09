@@ -1,5 +1,5 @@
-#ifndef CHARACTER.H
-#define CHARACTER.H
+#ifndef CHARACTER_H
+#define CHARACTER_H
 #include "bomb.h"
 class Character {
 public:

@@ -1,5 +1,5 @@
-#ifndef BOMBER.H
-#define BOMBER.H
+#ifndef BOMBER_H
+#define BOMBER_H
 #include "libraries/AdafruitGFX/Adafruit_GFX.h"
 #include "libraries/ILI9341/Adafruit_ILI9341.h"
 #include "libraries/Game_logic/character.h"
