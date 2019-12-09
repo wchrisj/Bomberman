@@ -13,10 +13,10 @@ Character::Character() {}
 
 //Maakt de character zichtbaar op het scherm.
 void Character::init(int _height, int _width, uint16_t _color) {
-	for(int i = 0; i < 285; i++) {
+	for(short i = 0; i < 285; i++) {
 		if(mapGenerator.map[i] == TYPE_LOCALPLAYER) {
-			x = i;
-			y = i;
+			x = (i % MAP_WIDTH)*16;
+			y = ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16;
 			prevX = x;
 			prevY = y;
 		}

@@ -80,7 +80,7 @@ int main (void)
 	sei();
 	Serial.begin(9600);
 	tft.begin();
-	mapGenerator.createMap(1); //Seed = 1
+	mapGenerator.createMap(0xFFFF); //Seed = 1
 	LCD lcd = LCD();
 	lcd.drawMap();
 	localCharacter.init(16, 16, ILI9341_YELLOW);

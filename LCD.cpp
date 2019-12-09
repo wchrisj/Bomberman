@@ -16,33 +16,44 @@ void LCD::drawWall(uint8_t x, uint8_t y) {
 }
 
 void LCD::drawMap(){
-    tft.fillScreen(ILI9341_BLACK);
-  // teken verticaal links                              // x─┐
-  for (int i = 0; i < (LENGTH / BLOCK_SIZE) - 1; i++){  // x │
-    drawWall(0, i);                                     // x─┘
-  }
-  
-  //teken horizontaal boven                             // xxx
-  for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){       // │ │
-    drawWall(i, 0);                                     // └─┘
-  }
-  
-  // teken horizontaal onder                            // ┌─┐
-  for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){       // │ │
-    drawWall(i, (LENGTH / BLOCK_SIZE) - 2);             // xxx
-  }
-  
-  // teken rechts verticaal                             // ┌─x
-  for (int i = 0; i < (LENGTH / BLOCK_SIZE) - 1; i++){  // │ x
-    drawWall((WIDTH / BLOCK_SIZE) - 1, i);              // └─x
-  }
-
-  // teken de losse BLOCK_SIZEken in het midden
-  for (int i = 2; i < (LENGTH / BLOCK_SIZE) - 2; i += 2) {
-    for (int k = 2; k < (WIDTH / BLOCK_SIZE) - 2; k += 2) {
-      drawWall(k, i); // teken muur
+  for(short i = 0; i < MAP_SIZE; i++ ){
+    if (mapGenerator.map[i] == TYPE_AIR) {
+      tft.fillRect((i % MAP_WIDTH)*16, ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16, 16, 16, ILI9341_BLACK);
+    }
+    else if (mapGenerator.map[i] == TYPE_WALL) {
+      tft.fillRect((i % MAP_WIDTH)*16, ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16, 16, 16, ILI9341_LIGHTGREY);
+    }
+    else if (mapGenerator.map[i] == TYPE_CRATE) {
+      tft.fillRect((i % MAP_WIDTH)*16, ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16, 16, 16, ILI9341_ORANGE);
     }
   }
+  //   tft.fillScreen(ILI9341_BLACK);
+  // // teken verticaal links                              // x─┐
+  // for (int i = 0; i < (LENGTH / BLOCK_SIZE) - 1; i++){  // x │
+  //   drawWall(0, i);                                     // x─┘
+  // }
+  
+  // //teken horizontaal boven                             // xxx
+  // for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){       // │ │
+  //   drawWall(i, 0);                                     // └─┘
+  // }
+  
+  // // teken horizontaal onder                            // ┌─┐
+  // for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){       // │ │
+  //   drawWall(i, (LENGTH / BLOCK_SIZE) - 2);             // xxx
+  // }
+  
+  // // teken rechts verticaal                             // ┌─x
+  // for (int i = 0; i < (LENGTH / BLOCK_SIZE) - 1; i++){  // │ x
+  //   drawWall((WIDTH / BLOCK_SIZE) - 1, i);              // └─x
+  // }
+
+  // // teken de losse BLOCK_SIZEken in het midden
+  // for (int i = 2; i < (LENGTH / BLOCK_SIZE) - 2; i += 2) {
+  //   for (int k = 2; k < (WIDTH / BLOCK_SIZE) - 2; k += 2) {
+  //     drawWall(k, i); // teken muur
+  //   }
+  // }
 }
 
 void LCD::statusBar(){
