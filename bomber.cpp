@@ -34,7 +34,7 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	if(bombs[1].exists) {
 		C_bombs[1]++;
 	}
-	if(C_charMove == CHARACTER_MOVE) { //200ms
+	if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
 		C_charMove = 0;
 		Serial.println("boop");
 		if (nunchuk->status.UP == 1) {
@@ -79,7 +79,7 @@ int main (void)
 	tft.begin();
 	LCD lcd = LCD();
 	lcd.drawMap();
-	character->init(0, 0, 16, 16, ILI9341_YELLOW);
+	localCharacter.init(16, 16, ILI9341_YELLOW);
 	gameTimerInit();
 
 	while (1)
@@ -95,6 +95,7 @@ int main (void)
 	return(0);
 }
 
+//Initalizeer timer1 voor de gameclock naar Compare A register elke 2ms
 void gameTimerInit() {
 	TCCR1A = 0; // set entire TCCR1A register to 0
 	TCCR1B = 0; // same for TCCR1B
@@ -110,13 +111,13 @@ void gameTimerInit() {
 }
 
 void draw() {
-	if((character->prevX != character->x) || (character->prevY != character->y)) {	
-		tft.fillRect(character->prevY, character->prevX, character->height, character->width, ILI9341_BLACK);
+	if((localCharacter.prevX != localCharacter.x) || (localCharacter.prevY != localCharacter.y)) {	
+		tft.fillRect(localCharacter.prevX, localCharacter.prevY, localCharacter.height, localCharacter.width, ILI9341_BLACK);
 	}
-	tft.fillRect(character->y, character->x, character->height, character->width, ILI9341_YELLOW);
-	if(bombs[0].exists == true) {
-		tft.fillRect(bombs[0].bombY, bombs[0].bombX, character->height, character->width, ILI9341_RED);
+	tft.fillRect(localCharacter.x, localCharacter.y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
+	if(localCharacter.bomb.exists == true) {
+		tft.fillRect(localCharacter.bomb.bombX, localCharacter.bomb.bombY, localCharacter.height, localCharacter.width, ILI9341_RED);
 	} else {
-		tft.fillRect(bombs[0].bombY, bombs[0].bombX, character->height, character->width, ILI9341_BLACK);
+		tft.fillRect(localCharacter.bomb.bombX, localCharacter.bomb.bombY, localCharacter.height, localCharacter.width, ILI9341_BLACK);
 	}
 }

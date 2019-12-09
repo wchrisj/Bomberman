@@ -1,5 +1,7 @@
 #ifndef CHARACTER.H
 #define CHARACTER.H
+
+#include "bomb.h"
 class Character {
 public:
 	static Character* getInstance();
