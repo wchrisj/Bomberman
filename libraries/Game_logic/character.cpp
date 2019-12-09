@@ -4,23 +4,23 @@
 
 #include "../../bomber.h"
 
-Character* Character::instance = 0;
+#define convertPosition (x/16)+(y/16)*15	//Ruwe positie bijv 160x160 omzetten naar een positie in de map array
+
+
+//char mapGenerator.map[MAP_SIZE] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 
 Character::Character() {}
 
-Character* Character::getInstance() {
-	if (instance == 0) {
-		instance = new Character();
-	}
-	return instance;
-}
-
 //Maakt de character zichtbaar op het scherm.
-void Character::init(int _y, int _x, int _height, int _width, uint16_t _color) {
-	x = _x;
-	prevX = _x;
-	y = _y;
-	prevY = _y;
+void Character::init(int _height, int _width, uint16_t _color) {
+	for(short i = 0; i < 285; i++) {
+		if(mapGenerator.map[i] == TYPE_LOCALPLAYER) {
+			x = (i % MAP_WIDTH)*16;
+			y = ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16;
+			prevX = x;
+			prevY = y;
+		}
+	}
 	height = _height;
 	width = _width;
 	color = _color;
@@ -33,93 +33,82 @@ void Character::init(int _y, int _x, int _height, int _width, uint16_t _color) {
 //Daarna wordt de huidige positie zwart getekend.
 //En als laatste wordt de nieuwe locatie van de speler getekend.
 void Character::move(Direction dir) {
+	prevY = y;
+	prevX = x;
 	if (dir == Character::UP) {
-		if ((y + height) < 240 && collision(Character::UP)) {
-			prevY = y;
-			prevX = x;
-			y += height;
+		if ((y - height) >= 0 && collision(Character::UP)) {
+			mapGenerator.map[convertPosition-MAP_WIDTH] = TYPE_LOCALPLAYER;
+			y -= height;
+			mapGenerator.map[convertPosition+MAP_WIDTH] = TYPE_AIR;
 		}
 	}
 	else if (dir == Character::RIGHT) {
-		if ((x + width) < 320 && collision(Character::RIGHT)) {
-			prevY = y;
-			prevX = x;
+		if ((x + width) < 240 && collision(Character::RIGHT)) {
+			mapGenerator.map[convertPosition+1] = TYPE_LOCALPLAYER;
 			x += width;
+			mapGenerator.map[convertPosition-1] = TYPE_AIR;
 		}
 	}
 	else if (dir == Character::DOWN) {
-		if ((y - height) > -1 && collision(Character::DOWN)) {
-			prevY = y;
-			prevX = x;
-			y -= height;
+		if ((y + height) < 320 && collision(Character::DOWN)) {
+			mapGenerator.map[convertPosition+MAP_WIDTH] = TYPE_LOCALPLAYER;
+			y += height;
+			mapGenerator.map[convertPosition-MAP_WIDTH] = TYPE_AIR;
 		}
 	}
 	else if (dir == Character::LEFT) {
-		if ((x - width) > -1 && collision(Character::LEFT)) {
-			prevY = y;
-			prevX = x;
+		if ((x - width) >= 0 && collision(Character::LEFT)) {
+			mapGenerator.map[convertPosition-1] = TYPE_LOCALPLAYER;
 			x -= width;
+			mapGenerator.map[convertPosition+1] = TYPE_AIR;
 		}
 	}
 }
 
 //Bekijkt of er in de gekozen richting een obstakel staat e.g. bom of muur.
 bool Character::collision(Direction dir) {
-
 	if (dir == Character::UP) {
 		//Check Up
-		return true;
-		// if(bombs[0].exists) {
-		// 	if((y + height) == bombs[0].bombY &&
-		// 		x != bombs[0].bombX) {
-		// 		return true;
-		// 	} else if ((y == bombs[0].bombY) &&
-		// 			   (x == bombs[0].bombX))  {
-		// 		return true;
-		// 	}
-		// } else {
-		// 	return true;
-		// }
+		int entity = mapGenerator.map[convertPosition-MAP_WIDTH];
+		if(entity == TYPE_AIR) {
+			Serial.println("air");
+			return true;
+		} else {
+			Serial.println("indestructible");
+			return false;
+		}
 	}
 	else if (dir == Character::RIGHT) {
 		//Check Right
-		return true;
-		// if(bombs[0].exists) {
-		// 	if((x + width) == bombs[0].bombX &&
-		// 		y != bombs[0].bombY) {
-		// 		return true;
-		// 	}
-		// } else {
-		// 	return true;
-		// }
+		int entity = mapGenerator.map[convertPosition+1];
+		if(entity == TYPE_AIR) {
+			Serial.println("air");
+			return true;
+		} else {
+			Serial.println("indestructible");
+			return false;
+		}
 	}
 	else if (dir == Character::DOWN) {
 		//Check Down
-		return true;
-		// if(bombs[0].exists) {
-		// 	if((y - height) == bombs[0].bombY &&
-		// 		x != bombs[0].bombX) {
-		// 		return true;
-		// 	} else if (y == bombs[0].bombY &&
-		// 			   x == bombs[0].bombX)  {
-		// 		return true;
-		// 	}
-		// } else {
-		// 	return true;
-		// }
+		int entity = mapGenerator.map[convertPosition+MAP_WIDTH];
+		if(entity == TYPE_AIR) {
+			Serial.println("air");
+			return true;
+		} else {
+			Serial.println("indestructible");
+			return false;
+		}
 	}
 	else if (dir == Character::LEFT) {
-		//Check Left
-		return true;
-		// if(bombs[0].exists) {
-		// 	if((x - width) == bombs[0].bombX &&
-		// 		y != bombs[0].bombY) {
-		// 		return true;
-		// 	}
-		// } else {
-		// 	return true;
-		// }
+		int entity = mapGenerator.map[convertPosition-1];
+		if(entity == TYPE_AIR) {
+			Serial.println("air");
+			return true;
+		} else {
+			Serial.println("indestructible");
+			return false;
+		}
 	}
-	
 	return false;
 }
