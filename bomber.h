@@ -11,9 +11,8 @@
 #define TFT_DC  9 // TFT display/command pin
 
 extern Adafruit_ILI9341 tft;
-extern Character localCharacter;
-extern Character externCharacter;
-// extern Bomb bombs[1];
+extern Character* character;
+extern Bomb bombs[1];
 extern NunchukInput* nunchuk;
 
 #endif

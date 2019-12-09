@@ -11,7 +11,6 @@
 #define LESS_THAN 64
 #define NEUTRAL 128
 #define MORE_THAN 192
-#define NUNCHUK_BYTES 6
 
 NunchukInput* NunchukInput::instance = 0;
 
@@ -37,13 +36,12 @@ NunchukInput::input status;
 void NunchukInput::nunchuk_get() {
 	Wire.beginTransmission(NUNCHUK_ADDR);
 	//6 bytes opvragen van de nunchuk
-	Wire.requestFrom(NUNCHUK_ADDR, NUNCHUK_BYTES);
+	Wire.requestFrom(NUNCHUK_ADDR, 6);
 	//Data opslaan
 	if (Wire.available()) {
 		for (uint8_t i = 0; i < 6 && Wire.available(); i++) {
 			nunchuk_data[i] = Wire.read();
 		}
-		//0x00 maakt de buffer schoon voor de volgende bytes
 		Wire.write(0x00);
 		Wire.endTransmission(true);
 		processNunchukData();

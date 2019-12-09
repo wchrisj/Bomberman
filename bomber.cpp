@@ -22,68 +22,66 @@ volatile int C_bombs[1];
 //https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 NunchukInput* nunchuk = NunchukInput::getInstance();
-Character localCharacter;
-Character externCharacter;
-//Bomb bombs[1];
+Character* character = Character::getInstance();
+Bomb bombs[1];
 
-//Game loop is 2 ms. Timer1 beheert dit.
-//Elke 2ms wordt de input van de nunchuk gelezen zodat de input vlot werkt en geen delays oplevert
-//Elke 200ms kan de character een stap zetten door de nunchuk uit te lezen
-//Elke 4000ms wordt er een bom ge-explodeerd indien er een bom aanwezig is
 ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	F_readNunchuk = 1;
 	C_charMove++;
-	if(localCharacter.bomb.exists) {
+	if(bombs[0].exists) {
 		C_bombs[0]++;
 	}
-	if(externCharacter.bomb.exists) {
+	if(bombs[1].exists) {
 		C_bombs[1]++;
 	}
 	if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
 		C_charMove = 0;
+		Serial.println("boop");
 		if (nunchuk->status.UP == 1) {
-			localCharacter.move(Character::UP);
+			character->move(Character::UP);
 			Serial.println("UP");
 		}
 		else if (nunchuk->status.RIGHT == 1) {
-			localCharacter.move(Character::RIGHT);
+			character->move(Character::RIGHT);
 			Serial.println("RIGHT");
 		}
 		else if (nunchuk->status.DOWN == 1) {
-			localCharacter.move(Character::DOWN);
+			character->move(Character::DOWN);
 			Serial.println("DOWN");
 		}
 		else if (nunchuk->status.LEFT == 1) {
-			localCharacter.move(Character::LEFT);
+			character->move(Character::LEFT);
 			Serial.println("LEFT");
 		}
 		if (nunchuk->status.Z == 1) {
-			if(!localCharacter.bomb.exists) {
-				localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
+			if(!bombs[0].exists) {
+				bombs[0].placeBomb();
 			}
 		}
 		draw();
 	}
 
-	if (C_bombs[0] == BOMB_EXPLODE) { //4seconden
+	if (C_bombs[0] == BOMB_EXPLODE) { //12seconden
 		C_bombs[0] = 0;
-		localCharacter.bomb.explodeBomb();
+		bombs[0].explodeBomb();
 	}
 	if (C_bombs[1] == BOMB_EXPLODE) {
 		C_bombs[1] = 0;
-		externCharacter.bomb.explodeBomb();
+		bombs[1].explodeBomb();
 	}
 }
 
 int main (void)
 {
 	sei();
+	_delay_ms(50);
 	Serial.begin(9600);
 	tft.begin();
 	LCD lcd = LCD();
 	lcd.drawMap();
 	localCharacter.init(16, 16, ILI9341_YELLOW);
 	gameTimerInit();
+
 	while (1)
 	{
 		//Wire van nunchuk gebruikt een ISR. ISR in ISR mag niet.
@@ -99,13 +97,16 @@ int main (void)
 
 //Initalizeer timer1 voor de gameclock naar Compare A register elke 2ms
 void gameTimerInit() {
-	TCCR1A = 0;
-	TCCR1B = 0;
-	TCNT1 = 0;
-	// compare match register A op 500hz zetten, aka 2ms.
-	OCR1A = 31999;
+	TCCR1A = 0; // set entire TCCR1A register to 0
+	TCCR1B = 0; // same for TCCR1B
+	TCNT1 = 0; // initialize counter value to 0
+	// set compare match register for 500 Hz increments
+	OCR1A = 31999; // = 16000000 / (1 * 500) - 1 (must be <65536) 500hz 2ms
+	// turn on CTC mode
 	TCCR1B |= (1 << WGM12);
+	// Set CS12, CS11 and CS10 bits for 1 prescaler
 	TCCR1B |= (0 << CS12) | (0 << CS11) | (1 << CS10);
+	// enable timer compare interrupt
 	TIMSK1 |= (1 << OCIE1A);
 }
 
