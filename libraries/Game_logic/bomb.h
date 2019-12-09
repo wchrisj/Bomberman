@@ -1,11 +1,10 @@
-#ifndef BOMB.H
-#define BOMB.H
+#ifndef BOMB_H
+#define BOMB_H
 
 class Bomb {
 public:
-	Bomb();
 	int bombX, bombY;
-	void placeBomb();
+	void placeBomb(int x, int y);
 	void explodeBomb();
 	bool exists;
 private:

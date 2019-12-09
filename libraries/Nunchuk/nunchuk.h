@@ -4,8 +4,8 @@
  * Created: 13/11/2019 11:35:58
  * Author : Simon Brolsma S1131109
  */
-#ifndef NUNCHUK.H
-#define NUNCHUK.H
+#ifndef NUNCHUK_H
+#define NUNCHUK_H
 class NunchukInput {
 public:
 	static NunchukInput* getInstance();
