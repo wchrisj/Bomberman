@@ -24,7 +24,7 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 NunchukInput* nunchuk = NunchukInput::getInstance();
 Character localCharacter;
 Character externCharacter;
-//Bomb bombs[1];
+Map mapGenerator;
 
 //Game loop is 2 ms. Timer1 beheert dit.
 //Elke 2ms wordt de input van de nunchuk gelezen zodat de input vlot werkt en geen delays oplevert
@@ -80,6 +80,7 @@ int main (void)
 	sei();
 	Serial.begin(9600);
 	tft.begin();
+	mapGenerator.createMap(1); //Seed = 1
 	LCD lcd = LCD();
 	lcd.drawMap();
 	localCharacter.init(16, 16, ILI9341_YELLOW);
