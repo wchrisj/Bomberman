@@ -11,7 +11,7 @@
 #define LESS_THAN 64
 #define NEUTRAL 128
 #define MORE_THAN 192
-#define NUNCHUK_BYTES
+#define NUNCHUK_BYTES 6
 
 NunchukInput* NunchukInput::instance = 0;
 
