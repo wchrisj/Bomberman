@@ -88,8 +88,9 @@ int main (void)
 	lcd.drawMap();
 	localCharacter.init(16, 16, ILI9341_YELLOW);
 
-	lcd.drawPlayer(11, 15, 0x0526);
-	lcd.drawPlayer(12, 15, 0xF800);
+	lcd.drawPlayer(11, 15, PLAYER_2);
+	lcd.drawPlayer(12, 15, PLAYER_1);
+	lcd.drawBomb(11, 16);
 
 	gameTimerInit();
 	while (1)

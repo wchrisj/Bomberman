@@ -3,12 +3,12 @@
 
 LCD::LCD() {
     tft.begin();
-    tft.fillScreen(ILI9341_BLACK);
+    tft.fillScreen(BG_COLOR);
 }
 
 void LCD::drawAir(uint8_t x, uint8_t y){
   //tft.drawRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, ILI9341_BLACK);
-  tft.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE, BG_COLOR); // deze doet raar in bovenhoek
+  tft.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE, BG_COLOR);
 }
 
 void LCD::drawWall(uint8_t x, uint8_t y) {
@@ -39,11 +39,26 @@ void LCD::drawCrate(uint8_t x, uint16_t y){
   tft.drawLine(x + 6, y + 4, x + 11, y + 9, CRATE_HIGHLIGHT);
 }
 
+void LCD::drawBomb(uint8_t x, uint16_t y){
+  x = x * BLOCK_SIZE;
+  y = y * BLOCK_SIZE;
+  tft.drawPixel(x + 10, y + 4, ILI9341_WHITE);
+  tft.drawPixel(x + 13, y + 3, ILI9341_WHITE);
+  tft.drawPixel(x + 14, y + 6, ILI9341_WHITE);
+  tft.drawLine(x + 8, y + 11, x + 12, y + 5, 0xEFE4);
+  tft.drawLine(x + 3, y + 11, x + 9, y + 8, ILI9341_RED);
+  tft.drawLine(x + 3, y + 12, x + 9, y + 9, ILI9341_RED);
+  tft.drawLine(x + 3, y + 13, x + 9, y + 10, ILI9341_RED);
+  tft.drawLine(x + 3, y + 14, x + 9, y + 11, ILI9341_RED);
+  tft.drawFastVLine(x + 2, y + 12, 2, 0xE000);
+  tft.drawFastVLine(x + 10, y + 8, 3, 0xF904);
+}
+
 void LCD::drawMap(){
   for(short i = 0; i < MAP_SIZE; i++ ){
     if (mapGenerator.map[i] == TYPE_AIR) {
       //tft.fillRect((i % MAP_WIDTH)*16, ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16, 16, 16, ILI9341_BLACK);
-      drawAir(i % MAP_WIDTH, (i-(i%MAP_WIDTH))/MAP_WIDTH);
+      //drawAir(i % MAP_WIDTH, (i-(i%MAP_WIDTH))/MAP_WIDTH); //deze is beetje gaar
     }
     else if (mapGenerator.map[i] == TYPE_WALL) {
       //tft.fillRect((i % MAP_WIDTH)*16, ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16, 16, 16, ILI9341_LIGHTGREY);
