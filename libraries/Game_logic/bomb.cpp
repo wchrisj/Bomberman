@@ -15,7 +15,7 @@ void Bomb::placeBomb(short _x, short _y) {
 }
 
 void Bomb::explodeBomb() {
-	for(char i = 1; i < 9; i+=2) {
+	for(char i = 0; i < 9; i++) {
 		uint8_t type = mapGenerator.map[bomb_area[i]];	
 		if(type == TYPE_CRATE) {
 			mapGenerator.map[bomb_area[i]] = 0;
@@ -80,7 +80,6 @@ void Bomb::calculateBombRange() {
 	}
 	for(char i = 1; i < 9; i+=2) {
 		uint8_t type = mapGenerator.map[bomb_area[i]];
-		Serial.print(type);
 		if(type == TYPE_WALL) {
 			bomb_area[i] = -1;
 			bomb_area[i+1] = -1;
@@ -90,14 +89,6 @@ void Bomb::calculateBombRange() {
 				  type == TYPE_LOCALPLAYER ||
 				  type == TYPE_EXTERNPLAYER) {
 			bomb_area[i+1] = -1;
-			if(type == TYPE_CRATE) {
-				mapGenerator.map[bomb_area[i]] = 0;
-			} else if(type == TYPE_LOCALPLAYER) {
-				//Remove life
-			} else if(type == TYPE_EXTERNPLAYER) {
-				//Remove life
-			}
 		}
 	}
-	Serial.println();
 }

@@ -1,7 +1,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
-
+#include <stdlib.h>
 #include "libraries/AdafruitGFX/Adafruit_GFX.h"
 #include "libraries/ILI9341/Adafruit_ILI9341.h"
 #include "bomber.h"
@@ -90,7 +90,7 @@ int main (void)
 	sei();
 	Serial.begin(9600);
 	tft.begin();
-	mapGenerator.createMap(0xFFFF); //Seed = 1
+	mapGenerator.createMap(0xABCD);
 	LCD lcd = LCD();
 	lcd.drawMap();
 	localCharacter.init(16, 16, ILI9341_YELLOW);
