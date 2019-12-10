@@ -8,6 +8,7 @@
 
 #define CHARACTER_MOVE 100
 #define BOMB_EXPLODE 2000
+#define BOMB_EXPLOSION 1500
 
 void gameTimerInit();
 void draw();
@@ -15,8 +16,9 @@ void draw();
 //F = Flag
 //C = Counter
 volatile char F_readNunchuk = 0;
+volatile short F_bombExplosion[1];
 volatile char C_charMove = 0;
-volatile int C_bombs[1];
+volatile short C_bombs[1];
 
 //Singleton design pattern
 //https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
@@ -35,9 +37,15 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	C_charMove++;
 	if(localCharacter.bomb.exists) {
 		C_bombs[0]++;
+		if(C_bombs[0] == BOMB_EXPLOSION) {
+			F_bombExplosion[0] = 1;
+		}
 	}
 	if(externCharacter.bomb.exists) {
 		C_bombs[1]++;
+		if(C_bombs[1] == BOMB_EXPLOSION) {
+			F_bombExplosion[1] = 1;
+		}
 	}
 	if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
 		C_charMove = 0;
@@ -67,10 +75,12 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 
 	if (C_bombs[0] == BOMB_EXPLODE) { //4seconden
 		C_bombs[0] = 0;
+		F_bombExplosion[0] = 0;
 		localCharacter.bomb.explodeBomb();
 	}
 	if (C_bombs[1] == BOMB_EXPLODE) {
 		C_bombs[1] = 0;
+		F_bombExplosion[1] = 0;
 		externCharacter.bomb.explodeBomb();
 	}
 }
@@ -111,13 +121,46 @@ void gameTimerInit() {
 }
 
 void draw() {
+	localCharacter.bomb.calculateBombRange();
+	//Tekent localCharacter op het scherm.
 	if((localCharacter.prevX != localCharacter.x) || (localCharacter.prevY != localCharacter.y)) {	
 		tft.fillRect(localCharacter.prevX, localCharacter.prevY, localCharacter.height, localCharacter.width, ILI9341_BLACK);
 	}
 	tft.fillRect(localCharacter.x, localCharacter.y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
+
+	//Tekent de bom van localCharacter op het scherm
 	if(localCharacter.bomb.exists == true) {
-		tft.fillRect(localCharacter.bomb.bombX, localCharacter.bomb.bombY, localCharacter.height, localCharacter.width, ILI9341_RED);
+		if(F_bombExplosion[0] == 1) {
+			for(char i = 0; i < 9; i++ ) {
+				if(localCharacter.bomb.bomb_area[i] != -1) {
+					short x = (localCharacter.bomb.bomb_area[i] % 15) * 16;
+					short y = ((localCharacter.bomb.bomb_area[i] - (localCharacter.bomb.bomb_area[i] % 15)) / 15) * 16;
+					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_RED);
+				}
+			}
+		} else {
+			tft.fillRect(localCharacter.bomb.x, localCharacter.bomb.y, localCharacter.height, localCharacter.width, ILI9341_RED);
+		}
 	} else {
-		tft.fillRect(localCharacter.bomb.bombX, localCharacter.bomb.bombY, localCharacter.height, localCharacter.width, ILI9341_BLACK);
+		for(char i = 0; i < 9; i++ ) {
+			short x = (localCharacter.bomb.bomb_area[i] % 15) * 16;
+			short y = ((localCharacter.bomb.bomb_area[i] - (localCharacter.bomb.bomb_area[i] % 15)) / 15) * 16;
+
+			char type = mapGenerator.map[localCharacter.bomb.bomb_area[i]];
+			switch(type) {
+				case TYPE_AIR:
+					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_BLACK);
+					break;
+				case TYPE_WALL:
+					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_LIGHTGREY);
+					break;
+				case TYPE_CRATE:
+					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_ORANGE);
+					break;
+				case TYPE_LOCALPLAYER:
+					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
+					break;
+			}
+		}
 	}
 }

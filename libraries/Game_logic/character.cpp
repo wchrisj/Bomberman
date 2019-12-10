@@ -21,6 +21,7 @@ void Character::init(int _height, int _width, uint16_t _color) {
 			prevY = y;
 		}
 	}
+	health = 3;
 	height = _height;
 	width = _width;
 	color = _color;
