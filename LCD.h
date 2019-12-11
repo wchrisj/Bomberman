@@ -49,9 +49,9 @@ class LCD {
 drawExplosion(x, y, i)
 i geeft aan welk explosie stuk moet worden getekent
 
-            5
-            1
-    7   3   0   4   8
             2
+            1
+        8 7 0 3 4
+            5
             6
 */

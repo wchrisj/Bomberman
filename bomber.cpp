@@ -150,10 +150,10 @@ void draw() {
 	localCharacter.bomb.calculateBombRange();
 	//Tekent localCharacter op het scherm.
 	if((localCharacter.prevX != localCharacter.x) || (localCharacter.prevY != localCharacter.y)) {	
-		lcd.drawAir(localCharacter.prevX, localCharacter.prevY);
+		lcd.drawAir(localCharacter.prevX / BLOCK_SIZE, localCharacter.prevY / BLOCK_SIZE);
 	}
   
-	lcd.drawPlayer(localCharacter.x / 16, localCharacter.y / 16, PLAYER_1); // mss later eerst nieuwe tekenen en dan pas oude weghalen
+	lcd.drawPlayer(localCharacter.x / BLOCK_SIZE, localCharacter.y / BLOCK_SIZE, PLAYER_1); // mss later eerst nieuwe tekenen en dan pas oude weghalen
 	//tft.fillRect(localCharacter.x, localCharacter.y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
 	//Tekent de bom van localCharacter op het scherm
 
@@ -164,12 +164,16 @@ void draw() {
 				if(localCharacter.bomb.bomb_area[i] != -1) {
 					short x = (localCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
 					short y = ((localCharacter.bomb.bomb_area[i] - (localCharacter.bomb.bomb_area[i] % MAP_WIDTH)) / MAP_WIDTH) * BLOCK_SIZE;
-					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_RED);
+					if(localCharacter.bomb.bomb_area[i+1] == -1 && i % 2 == 1) {
+						lcd.drawExplosion(x / BLOCK_SIZE, y / BLOCK_SIZE, i+1);
+					} else {
+						lcd.drawExplosion(x / BLOCK_SIZE, y / BLOCK_SIZE, i);
+					}
 				}
 			}
 		} else {
 			//Bom is geplaatst maar nog niet ge-explodeerd
-			tft.fillRect(localCharacter.bomb.x, localCharacter.bomb.y, localCharacter.height, localCharacter.width, ILI9341_RED);
+			lcd.drawBomb(localCharacter.bomb.x / BLOCK_SIZE, localCharacter.bomb.y / BLOCK_SIZE);
 		}
 	} else {
 
@@ -181,16 +185,16 @@ void draw() {
 			char type = mapGenerator.map[localCharacter.bomb.bomb_area[i]]; //Lees uit wat voor type het object is volgens de map
 			switch(type) {
 				case TYPE_AIR:
-					lcd.drawAir(localCharacter.bomb.bombX, localCharacter.bomb.bombY);
+					lcd.drawAir(x / BLOCK_SIZE, y / BLOCK_SIZE);
 					break;
 				case TYPE_WALL:
-					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_LIGHTGREY);
+					lcd.drawWall(x / BLOCK_SIZE, y / BLOCK_SIZE);
 					break;
 				case TYPE_CRATE:
-					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_ORANGE);
+					lcd.drawCrate(x / BLOCK_SIZE, y / BLOCK_SIZE);
 					break;
 				case TYPE_LOCALPLAYER:
-					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
+					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_1);
 					break;
 			}
 		}
