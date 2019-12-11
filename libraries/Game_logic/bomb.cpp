@@ -4,7 +4,7 @@
 
 #include "../../bomber.h"
 
-#define convertPosition (x/16)+(y/16)*15	//Ruwe positie bijv 160x160 omzetten naar een positie in de map array
+#define convertPosition (x/BLOCK_SIZE)+(y/BLOCK_SIZE)*MAP_WIDTH	//Ruwe positie bijv 160x160 omzetten naar een positie in de map array
 
 //Update positie van de bom & zet de Flag voor de draw functie zodat die weet dat een bom wel/niet getekend moet worden
 void Bomb::placeBomb(short _x, short _y) {
@@ -15,7 +15,7 @@ void Bomb::placeBomb(short _x, short _y) {
 }
 
 void Bomb::explodeBomb() {
-	for(char i = 0; i < 9; i++) {
+	for(char i = 0; i < BOMB_TILES; i++) {
 		uint8_t type = mapGenerator.map[bomb_area[i]];	
 		if(type == TYPE_CRATE) {
 			mapGenerator.map[bomb_area[i]] = 0;
@@ -31,7 +31,7 @@ void Bomb::explodeBomb() {
 }
 
 void Bomb::calculateBombRange() {
-	for(char i = 0; i < 9; i++) {
+	for(char i = 0; i < BOMB_TILES; i++) {
 		switch(i) {
 			case 0: //Center position
 				bomb_area[i] = convertPosition;
@@ -78,7 +78,7 @@ void Bomb::calculateBombRange() {
 				break;
 		}
 	}
-	for(char i = 1; i < 9; i+=2) {
+	for(char i = 1; i < BOMB_TILES; i+=2) { //i+=2 zodat alleen de eerst aanliggende tiles worden bekeken
 		uint8_t type = mapGenerator.map[bomb_area[i]];
 		if(type == TYPE_WALL) {
 			bomb_area[i] = -1;

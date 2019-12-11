@@ -131,22 +131,25 @@ void draw() {
 	//Tekent de bom van localCharacter op het scherm
 	if(localCharacter.bomb.exists == true) {
 		if(F_bombExplosion[0] == 1) {
-			for(char i = 0; i < 9; i++ ) {
+			for(char i = 0; i < BOMB_TILES; i++ ) {
+				//Teken elk blokje rood tenzij het -1 is.
 				if(localCharacter.bomb.bomb_area[i] != -1) {
-					short x = (localCharacter.bomb.bomb_area[i] % 15) * 16;
-					short y = ((localCharacter.bomb.bomb_area[i] - (localCharacter.bomb.bomb_area[i] % 15)) / 15) * 16;
+					short x = (localCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
+					short y = ((localCharacter.bomb.bomb_area[i] - (localCharacter.bomb.bomb_area[i] % MAP_WIDTH)) / MAP_WIDTH) * BLOCK_SIZE;
 					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_RED);
 				}
 			}
 		} else {
+			//Bom is geplaatst maar nog niet ge-explodeerd
 			tft.fillRect(localCharacter.bomb.x, localCharacter.bomb.y, localCharacter.height, localCharacter.width, ILI9341_RED);
 		}
 	} else {
-		for(char i = 0; i < 9; i++ ) {
-			short x = (localCharacter.bomb.bomb_area[i] % 15) * 16;
-			short y = ((localCharacter.bomb.bomb_area[i] - (localCharacter.bomb.bomb_area[i] % 15)) / 15) * 16;
+		//Bom bestaat niet, dus teken elk blokje de juiste kleur volgens de map
+		for(char i = 0; i < BOMB_TILES; i++ ) {
+			short x = (localCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
+			short y = ((localCharacter.bomb.bomb_area[i] - (localCharacter.bomb.bomb_area[i] % MAP_WIDTH)) / MAP_WIDTH) * BLOCK_SIZE;
 
-			char type = mapGenerator.map[localCharacter.bomb.bomb_area[i]];
+			char type = mapGenerator.map[localCharacter.bomb.bomb_area[i]]; //Lees uit wat voor type het object is volgens de map
 			switch(type) {
 				case TYPE_AIR:
 					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_BLACK);

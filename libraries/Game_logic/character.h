@@ -12,7 +12,6 @@ public:
 	void init(int _height, int _width, uint16_t _color);
 	void move(Direction dir);
 	bool collision(Direction dir);
-	Character();
 private:
 };
 #endif

@@ -4,19 +4,14 @@
 
 #include "../../bomber.h"
 
-#define convertPosition (x/16)+(y/16)*15	//Ruwe positie bijv 160x160 omzetten naar een positie in de map array
-
-
-//char mapGenerator.map[MAP_SIZE] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-
-Character::Character() {}
+#define convertPosition (x/BLOCK_SIZE)+(y/BLOCK_SIZE)*MAP_WIDTH	//Ruwe positie bijv 160x160 omzetten naar een positie in de map array
 
 //Maakt de character zichtbaar op het scherm.
 void Character::init(int _height, int _width, uint16_t _color) {
-	for(short i = 0; i < 285; i++) {
+	for(short i = 0; i < MAP_SIZE; i++) {
 		if(mapGenerator.map[i] == TYPE_LOCALPLAYER) {
-			x = (i % MAP_WIDTH)*16;
-			y = ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16;
+			x = (i % MAP_WIDTH)*BLOCK_SIZE;
+			y = ((i-(i%MAP_WIDTH))/MAP_WIDTH)*BLOCK_SIZE;
 			prevX = x;
 			prevY = y;
 		}
@@ -37,28 +32,28 @@ void Character::move(Direction dir) {
 	prevY = y;
 	prevX = x;
 	if (dir == Character::UP) {
-		if ((y - height) >= 0 && collision(Character::UP)) {
+		if (collision(Character::UP)) {
 			mapGenerator.map[convertPosition-MAP_WIDTH] = TYPE_LOCALPLAYER;
 			y -= height;
 			mapGenerator.map[convertPosition+MAP_WIDTH] = TYPE_AIR;
 		}
 	}
 	else if (dir == Character::RIGHT) {
-		if ((x + width) < 240 && collision(Character::RIGHT)) {
+		if (collision(Character::RIGHT)) {
 			mapGenerator.map[convertPosition+1] = TYPE_LOCALPLAYER;
 			x += width;
 			mapGenerator.map[convertPosition-1] = TYPE_AIR;
 		}
 	}
 	else if (dir == Character::DOWN) {
-		if ((y + height) < 320 && collision(Character::DOWN)) {
+		if (collision(Character::DOWN)) {
 			mapGenerator.map[convertPosition+MAP_WIDTH] = TYPE_LOCALPLAYER;
 			y += height;
 			mapGenerator.map[convertPosition-MAP_WIDTH] = TYPE_AIR;
 		}
 	}
 	else if (dir == Character::LEFT) {
-		if ((x - width) >= 0 && collision(Character::LEFT)) {
+		if (collision(Character::LEFT)) {
 			mapGenerator.map[convertPosition-1] = TYPE_LOCALPLAYER;
 			x -= width;
 			mapGenerator.map[convertPosition+1] = TYPE_AIR;
