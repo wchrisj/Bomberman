@@ -9,6 +9,8 @@
 #define CHARACTER_MOVE 100
 #define BOMB_EXPLODE 2000
 #define BOMB_EXPLOSION 1500
+#define LOCAL_PLAYER 0
+#define EXTERN_PLAYER 1
 
 void gameTimerInit();
 void draw();
@@ -36,9 +38,9 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	F_readNunchuk = 1;
 	C_charMove++;
 	if(localCharacter.bomb.exists) {
-		C_bombs[0]++;
-		if(C_bombs[0] == BOMB_EXPLOSION) {
-			F_bombExplosion[0] = 1;
+		C_bombs[LOCAL_PLAYER]++;
+		if(C_bombs[LOCAL_PLAYER] == BOMB_EXPLOSION) {
+			F_bombExplosion[LOCAL_PLAYER] = 1;
 		}
 	}
 	if(externCharacter.bomb.exists) {
@@ -73,14 +75,14 @@ ISR(TIMER1_COMPA_vect) { //Elke 2ms
 		draw();
 	}
 
-	if (C_bombs[0] == BOMB_EXPLODE) { //4seconden
-		C_bombs[0] = 0;
-		F_bombExplosion[0] = 0;
+	if (C_bombs[LOCAL_PLAYER] == BOMB_EXPLODE) { //4seconden
+		C_bombs[LOCAL_PLAYER] = 0;
+		F_bombExplosion[LOCAL_PLAYER] = 0;
 		localCharacter.bomb.explodeBomb();
 	}
-	if (C_bombs[1] == BOMB_EXPLODE) {
-		C_bombs[1] = 0;
-		F_bombExplosion[1] = 0;
+	if (C_bombs[EXTERN_PLAYER] == BOMB_EXPLODE) {
+		C_bombs[EXTERN_PLAYER] = 0;
+		F_bombExplosion[EXTERN_PLAYER] = 0;
 		externCharacter.bomb.explodeBomb();
 	}
 }
@@ -130,7 +132,7 @@ void draw() {
 
 	//Tekent de bom van localCharacter op het scherm
 	if(localCharacter.bomb.exists == true) {
-		if(F_bombExplosion[0] == 1) {
+		if(F_bombExplosion[LOCAL_PLAYER] == 1) {
 			for(char i = 0; i < BOMB_TILES; i++ ) {
 				//Teken elk blokje rood tenzij het -1 is.
 				if(localCharacter.bomb.bomb_area[i] != -1) {
