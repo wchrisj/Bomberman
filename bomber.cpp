@@ -87,6 +87,7 @@ int main (void)
 	//LCD lcd = LCD();
 	lcd.drawMap();
 	localCharacter.init(16, 16, ILI9341_YELLOW);
+	lcd.statusBar();
 
 /*
 	lcd.drawPlayer(11, 15, PLAYER_2);
@@ -136,7 +137,7 @@ void draw() {
 	if((localCharacter.prevX != localCharacter.x) || (localCharacter.prevY != localCharacter.y)) {	
 		lcd.drawAir(localCharacter.prevX, localCharacter.prevY);
 	}
-	lcd.drawPlayer(localCharacter.x / 16, localCharacter.y / 16, 0x8810); // mss later eerst nieuwe tekenen en dan pas oude weghalen
+	lcd.drawPlayer(localCharacter.x / 16, localCharacter.y / 16, PLAYER_1); // mss later eerst nieuwe tekenen en dan pas oude weghalen
 	//tft.fillRect(localCharacter.x, localCharacter.y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
 	if(localCharacter.bomb.exists == true) {
 		tft.fillRect(localCharacter.bomb.bombX, localCharacter.bomb.bombY, localCharacter.height, localCharacter.width, ILI9341_RED);

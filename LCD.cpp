@@ -232,9 +232,11 @@ void LCD::drawPlayer(uint8_t x, uint16_t y, uint16_t c){
 }
 
 void LCD::statusBar(){
+  tft.fillRect(0, LENGTH - BLOCK_SIZE, WIDTH, BLOCK_SIZE, ILI9341_BLACK);
   tft.setCursor(0, LENGTH - BLOCK_SIZE +2);
-  tft.setTextColor(ILI9341_YELLOW);  tft.setTextSize(2);
+  tft.setTextColor(PLAYER_1);  tft.setTextSize(2);
   tft.print("P1");
-  tft.setTextColor(ILI9341_BLUE);
+  tft.setCursor(5 * BLOCK_SIZE, LENGTH - BLOCK_SIZE +2);
+  tft.setTextColor(PLAYER_2);
   tft.print(" P2");
 }

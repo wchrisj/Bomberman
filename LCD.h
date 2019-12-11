@@ -23,6 +23,7 @@
 #define BROWN 0x9220
 #define PLAYER_1 0xF800         // mario rood voor player
 #define PLAYER_2 0x0526         // luigi groen voor player
+#define WALUIGI 0x8810
 #define OUTER 0xF320    // donker oranje
 #define MIDDLE 0xF520   // oranje
 #define INNER 0xF6E6    // licht oranje
@@ -42,3 +43,14 @@ class LCD {
     private:
 };
 #endif
+
+
+/*
+drawExplosion()
+
+            5
+            1
+    7   3   0   4   8
+            2
+            6
+*/
