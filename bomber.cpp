@@ -88,9 +88,23 @@ int main (void)
 	lcd.drawMap();
 	localCharacter.init(16, 16, ILI9341_YELLOW);
 
+/*
 	lcd.drawPlayer(11, 15, PLAYER_2);
 	lcd.drawPlayer(12, 15, PLAYER_1);
 	lcd.drawBomb(11, 16);
+	lcd.drawExplosion(9, 9, 0);
+	lcd.drawExplosion(9, 8, 1);
+	lcd.drawAir(10, 9);
+	lcd.drawAir(11, 9);
+	lcd.drawAir(7, 9);
+	lcd.drawExplosion(9, 10, 2);
+	lcd.drawExplosion(8, 9, 3);
+	lcd.drawExplosion(10, 9, 4);
+	lcd.drawExplosion(9, 7, 5);
+	lcd.drawExplosion(9, 11, 6);
+	lcd.drawExplosion(11, 9, 8);
+	lcd.drawExplosion(7, 9, 7);
+*/
 
 	gameTimerInit();
 	while (1)

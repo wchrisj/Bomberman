@@ -23,6 +23,9 @@
 #define BROWN 0x9220
 #define PLAYER_1 0xF800         // mario rood voor player
 #define PLAYER_2 0x0526         // luigi groen voor player
+#define OUTER 0xF320    // donker oranje
+#define MIDDLE 0xF520   // oranje
+#define INNER 0xF6E6    // licht oranje
 
 class LCD {
     public:
@@ -31,6 +34,7 @@ class LCD {
         void drawWall(uint8_t x, uint8_t y);
         void drawCrate(uint8_t x, uint16_t y);
         void drawBomb(uint8_t x, uint16_t y);
+        void drawExplosion(uint8_t x, uint16_t y, uint8_t i);
         void drawMap();
         void drawPlayer(uint8_t x, uint16_t y, uint16_t c);
         void statusBar();
