@@ -30,6 +30,9 @@ Character localCharacter;
 Character externCharacter;
 Map mapGenerator;
 
+
+	LCD lcd = LCD();
+
 //Game loop is 2 ms. Timer1 beheert dit.
 //Elke 2ms wordt de input van de nunchuk gelezen zodat de input vlot werkt en geen delays oplevert
 //Elke 200ms kan de character een stap zetten door de nunchuk uit te lezen
@@ -91,11 +94,32 @@ int main (void)
 {
 	sei();
 	Serial.begin(9600);
-	tft.begin();
-	mapGenerator.createMap(0xABCD);
-	LCD lcd = LCD();
+	//tft.begin();
+	mapGenerator.createMap(0xFFFF); //Seed = 1
+	//LCD lcd = LCD();
+
 	lcd.drawMap();
 	localCharacter.init(16, 16, ILI9341_YELLOW);
+	lcd.statusBar();
+
+/*
+	lcd.drawPlayer(11, 15, PLAYER_2);
+	lcd.drawPlayer(12, 15, PLAYER_1);
+	lcd.drawBomb(11, 16);
+	lcd.drawExplosion(9, 9, 0);
+	lcd.drawExplosion(9, 8, 1);
+	lcd.drawAir(10, 9);
+	lcd.drawAir(11, 9);
+	lcd.drawAir(7, 9);
+	lcd.drawExplosion(9, 10, 2);
+	lcd.drawExplosion(8, 9, 3);
+	lcd.drawExplosion(10, 9, 4);
+	lcd.drawExplosion(9, 7, 5);
+	lcd.drawExplosion(9, 11, 6);
+	lcd.drawExplosion(11, 9, 8);
+	lcd.drawExplosion(7, 9, 7);
+*/
+
 	gameTimerInit();
 	while (1)
 	{
@@ -126,11 +150,13 @@ void draw() {
 	localCharacter.bomb.calculateBombRange();
 	//Tekent localCharacter op het scherm.
 	if((localCharacter.prevX != localCharacter.x) || (localCharacter.prevY != localCharacter.y)) {	
-		tft.fillRect(localCharacter.prevX, localCharacter.prevY, localCharacter.height, localCharacter.width, ILI9341_BLACK);
+		lcd.drawAir(localCharacter.prevX / BLOCK_SIZE, localCharacter.prevY / BLOCK_SIZE);
 	}
-	tft.fillRect(localCharacter.x, localCharacter.y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
-
+  
+	lcd.drawPlayer(localCharacter.x / BLOCK_SIZE, localCharacter.y / BLOCK_SIZE, PLAYER_1); // mss later eerst nieuwe tekenen en dan pas oude weghalen
+	//tft.fillRect(localCharacter.x, localCharacter.y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
 	//Tekent de bom van localCharacter op het scherm
+
 	if(localCharacter.bomb.exists == true) {
 		if(F_bombExplosion[LOCAL_PLAYER] == 1) {
 			for(char i = 0; i < BOMB_TILES; i++ ) {
@@ -138,14 +164,19 @@ void draw() {
 				if(localCharacter.bomb.bomb_area[i] != -1) {
 					short x = (localCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
 					short y = ((localCharacter.bomb.bomb_area[i] - (localCharacter.bomb.bomb_area[i] % MAP_WIDTH)) / MAP_WIDTH) * BLOCK_SIZE;
-					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_RED);
+					if(localCharacter.bomb.bomb_area[i+1] == -1 && i % 2 == 1) {
+						lcd.drawExplosion(x / BLOCK_SIZE, y / BLOCK_SIZE, i+1);
+					} else {
+						lcd.drawExplosion(x / BLOCK_SIZE, y / BLOCK_SIZE, i);
+					}
 				}
 			}
 		} else {
 			//Bom is geplaatst maar nog niet ge-explodeerd
-			tft.fillRect(localCharacter.bomb.x, localCharacter.bomb.y, localCharacter.height, localCharacter.width, ILI9341_RED);
+			lcd.drawBomb(localCharacter.bomb.x / BLOCK_SIZE, localCharacter.bomb.y / BLOCK_SIZE);
 		}
 	} else {
+
 		//Bom bestaat niet, dus teken elk blokje de juiste kleur volgens de map
 		for(char i = 0; i < BOMB_TILES; i++ ) {
 			short x = (localCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
@@ -154,16 +185,16 @@ void draw() {
 			char type = mapGenerator.map[localCharacter.bomb.bomb_area[i]]; //Lees uit wat voor type het object is volgens de map
 			switch(type) {
 				case TYPE_AIR:
-					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_BLACK);
+					lcd.drawAir(x / BLOCK_SIZE, y / BLOCK_SIZE);
 					break;
 				case TYPE_WALL:
-					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_LIGHTGREY);
+					lcd.drawWall(x / BLOCK_SIZE, y / BLOCK_SIZE);
 					break;
 				case TYPE_CRATE:
-					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_ORANGE);
+					lcd.drawCrate(x / BLOCK_SIZE, y / BLOCK_SIZE);
 					break;
 				case TYPE_LOCALPLAYER:
-					tft.fillRect(x, y, localCharacter.height, localCharacter.width, ILI9341_YELLOW);
+					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_1);
 					break;
 			}
 		}
