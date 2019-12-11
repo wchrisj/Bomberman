@@ -33,45 +33,45 @@ void Bomb::explodeBomb() {
 void Bomb::calculateBombRange() {
 	for(char i = 0; i < BOMB_TILES; i++) {
 		switch(i) {
-			case 0: //Center position
+			case 0: //Middenpunt
 				bomb_area[i] = convertPosition;
 				break;
-			case 1: //One above center
+			case 1: //Één plaats boven het midden
 				if(convertPosition-MAP_WIDTH >= 0) {
 					bomb_area[i] = convertPosition-MAP_WIDTH;
 				}
 				break;
-			case 2: //Two above center
+			case 2: //Twee plaatsen boven het midden
 				if(convertPosition-MAP_WIDTH >= 0) {
 					bomb_area[i] = convertPosition-(MAP_WIDTH * 2);
 				}
 				break;
-			case 3:	//One to the right of center
+			case 3:	//Één plaats rechts van het midden
 				if(convertPosition-MAP_WIDTH <= 285) {
 					bomb_area[i] = convertPosition+1;
 				}
 				break;
-			case 4: //Two to the right of center
+			case 4: //Twee plaatsen naar het rechts van midden
 				if(convertPosition-MAP_WIDTH <= 285) {
 					bomb_area[i] = convertPosition+2;
 				}
 				break;
-			case 5: //One below center
+			case 5: //Één plaats beneden het midden
 				if(convertPosition-MAP_WIDTH <= 285) {
 					bomb_area[i] = convertPosition+MAP_WIDTH;
 				}
 				break;
-			case 6: //Two below center
+			case 6: //Twee plaatsen onder het midden
 				if(convertPosition-MAP_WIDTH <= 285) {
 					bomb_area[i] = convertPosition+(MAP_WIDTH * 2);
 				}
 				break;
-			case 7: //One to the left of center
+			case 7: //Één plaats links van het midden
 				if(convertPosition-MAP_WIDTH >= 0) {
 					bomb_area[i] = convertPosition-1;
 				}
 				break;
-			case 8: //Two to the left of center
+			case 8: //Twee plaatsen links van het midden
 				if(convertPosition-MAP_WIDTH >= 0) {
 					bomb_area[i] = convertPosition-2;
 				}
