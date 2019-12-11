@@ -7,7 +7,6 @@ LCD::LCD() {
 }
 
 void LCD::drawAir(uint8_t x, uint8_t y){
-  //tft.drawRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, ILI9341_BLACK);
   tft.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, BG_COLOR);
 }
 
@@ -54,9 +53,10 @@ void LCD::drawBomb(uint8_t x, uint16_t y){
   tft.drawFastVLine(x + 10, y + 8, 3, 0xF904);
 }
 
-void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){
+void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){ // zie LCD.h voor meer info
   x = x * BLOCK_SIZE;
   y = y * BLOCK_SIZE;
+  // middenstuk
   if(i == 0){
     tft.fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE, OUTER);
     tft.fillRect(x + 2, y + 2, 12, 12, MIDDLE);
@@ -69,11 +69,12 @@ void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){
     tft.fillRect(x + 7, y + 3, 2, 10, ILI9341_WHITE);
     tft.fillRoundRect(x + 5, y + 5, 6, 6, 1, ILI9341_WHITE);
   }
+  // verticaal tussenstukken
   if(i == 1 || i == 2){
     tft.drawFastVLine(x + 4, y, BLOCK_SIZE, MIDDLE);
     tft.drawFastVLine(x + 11, y, BLOCK_SIZE, MIDDLE);
     tft.fillRect(x + 5, y, 6, BLOCK_SIZE, INNER);
-    if(i == 1){
+    if(i == 1){ // boven
         tft.drawFastVLine(x + 3, y + 9, 7, MIDDLE);
         tft.drawFastVLine(x + 12, y + 9, 7, MIDDLE);
         tft.drawFastVLine(x + 2, y + 10, 3, OUTER);
@@ -82,7 +83,7 @@ void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){
         tft.drawPixel(x + 14, y + 12, OUTER);
         tft.fillRect(x, y + 13, 3, 3, OUTER);
         tft.fillRect(x + 13, y + 13, 3, 3, OUTER);
-    } else {
+    } else { // onder
         tft.drawFastVLine(x + 3, y, 7, MIDDLE);
         tft.drawFastVLine(x + 12, y, 7, MIDDLE);
         tft.drawFastVLine(x + 2, y, 3, OUTER);
@@ -93,11 +94,12 @@ void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){
         tft.fillRect(x + 13, y, 3, 3, OUTER);
     }
   }
+  // hozontale tussenstukken
   else if (i == 3 || i == 4){
     tft.drawFastHLine(x, y + 4, BLOCK_SIZE, MIDDLE);
     tft.drawFastHLine(x, y + 11, BLOCK_SIZE, MIDDLE);
     tft.fillRect(x, y + 5, BLOCK_SIZE, 6, INNER);
-    if(i == 3){
+    if(i == 3){ // links
         tft.drawFastHLine(x + 9, y + 3, 7, MIDDLE);
         tft.drawFastHLine(x + 9, y + 12, 7, MIDDLE);
         tft.drawFastHLine(x + 10, y + 2, 3, OUTER);
@@ -106,7 +108,7 @@ void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){
         tft.drawPixel(x + 12, y + 14, OUTER);
         tft.fillRect(x + 13, y, 3, 3, OUTER);
         tft.fillRect(x + 13, y + 13, 3, 3, OUTER);
-    } else {
+    } else { //  rechts
         tft.drawFastHLine(x, y + 3, 7, MIDDLE);
         tft.drawFastHLine(x, y + 12, 7, MIDDLE);
         tft.drawFastHLine(x + 3, y + 2, 3, OUTER);
@@ -117,6 +119,7 @@ void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){
         tft.fillRect(x, y + 13, 3, 3, OUTER);
     }
   }
+  // eindstuk boven
   else if (i == 5){
     tft.fillRect(x + 4, y + 11, 8, 5, MIDDLE);
     tft.fillRect(x + 5, y + 12, 6, 4, INNER);
@@ -124,6 +127,7 @@ void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){
     tft.drawFastHLine(x + 5, y + 10, 6, MIDDLE);
     tft.drawFastHLine(x + 6, y + 9, 4, MIDDLE);
   }
+  // eindstuk onder
   else if (i == 6){
     tft.fillRect(x + 4, y, 8, 5, MIDDLE);
     tft.fillRect(x + 5, y, 6, 4, INNER);
@@ -131,6 +135,7 @@ void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){
     tft.drawFastHLine(x + 5, y + 5, 6, MIDDLE);
     tft.drawFastHLine(x + 6, y + 6, 4, MIDDLE);
   }
+  // eindstuk links
   else if (i == 7){
     tft.fillRect(x + 11, y + 4, 5, 8, MIDDLE);
     tft.fillRect(x + 12, y + 5, 4, 6, INNER);
@@ -138,6 +143,7 @@ void LCD::drawExplosion(uint8_t x, uint16_t y, uint8_t i){
     tft.drawFastVLine(x + 10, y + 5, 6, MIDDLE);
     tft.drawFastVLine(x + 9, y + 6, 4, MIDDLE);
   }
+  // eindstuk rechts
   else if (i == 8){
     tft.fillRect(x, y + 4, 5, 8, MIDDLE);
     tft.fillRect(x, y + 5, 4, 6, INNER);
@@ -162,40 +168,11 @@ void LCD::drawMap(){
       drawCrate(i % MAP_WIDTH, (i-(i%MAP_WIDTH))/MAP_WIDTH);
     }
   }
-  //   tft.fillScreen(ILI9341_BLACK);
-  // // teken verticaal links                              // x─┐
-  // for (int i = 0; i < (LENGTH / BLOCK_SIZE) - 1; i++){  // x │
-  //   drawWall(0, i);                                     // x─┘
-  // }
-  
-  // //teken horizontaal boven                             // xxx
-  // for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){       // │ │
-  //   drawWall(i, 0);                                     // └─┘
-  // }
-  
-  // // teken horizontaal onder                            // ┌─┐
-  // for (int i = 0; i < (WIDTH / BLOCK_SIZE); i++){       // │ │
-  //   drawWall(i, (LENGTH / BLOCK_SIZE) - 2);             // xxx
-  // }
-  
-  // // teken rechts verticaal                             // ┌─x
-  // for (int i = 0; i < (LENGTH / BLOCK_SIZE) - 1; i++){  // │ x
-  //   drawWall((WIDTH / BLOCK_SIZE) - 1, i);              // └─x
-  // }
-
-  // // teken de losse BLOCK_SIZEken in het midden
-  // for (int i = 2; i < (LENGTH / BLOCK_SIZE) - 2; i += 2) {
-  //   for (int k = 2; k < (WIDTH / BLOCK_SIZE) - 2; k += 2) {
-  //     drawWall(k, i); // teken muur
-  //   }
-  // }
 }
 
 void LCD::drawPlayer(uint8_t x, uint16_t y, uint16_t c){
   x = x * BLOCK_SIZE;
   y = y * BLOCK_SIZE;
-  //uint16_t c = 0xF800;
-  //uint16_t c = 0x0526;
   // hoofd
   tft.drawFastHLine(x + 5, y, 6, c);
   tft.drawFastHLine(x + 4, y + 1, 10, c);

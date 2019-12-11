@@ -46,7 +46,8 @@ class LCD {
 
 
 /*
-drawExplosion()
+drawExplosion(x, y, i)
+i geeft aan welk explosie stuk moet worden getekent
 
             5
             1
