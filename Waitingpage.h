@@ -6,11 +6,22 @@
 #include "libraries/ILI9341/Adafruit_ILI9341.h"
 #include "libraries/Nunchuk/nunchuk.h"
 
+#define WP_CURSOR_X10 10
+#define WP_CURSOR_X60 60
+
+#define WP_CURSOR_Y10 10
+#define WP_CURSOR_Y60 60
+#define WP_CURSOR_Y100 100
+#define WP_CURSOR_Y120 120
+
+#define MAXDOTS 11
+#define WP_DOT2DOT_SIZE 20
 
 class Waitingpage {
     public:
         Waitingpage(Adafruit_ILI9341 *tft);
         void show(Adafruit_ILI9341 *tft);  
+        void cycle(Adafruit_ILI9341 *tft, uint8_t *cycle_staps);
     private:
 };
 

@@ -5,15 +5,14 @@
 #include "libraries/AdafruitGFX/Adafruit_GFX.h"
 #include "libraries/ILI9341/Adafruit_ILI9341.h"
 #include "libraries/Nunchuk/nunchuk.h"
+#include "LCD.h"
 
+#define HP_CURSOR_X10 10
+#define HP_CURSOR_X60 60
 
-#define TFT_DC 9
-#define TFT_CS 10
-
-#define BLOCK_SIZE 16
-#define LENGTH 320
-#define WIDTH 240
-
+#define HP_CURSOR_Y10 10
+#define HP_CURSOR_Y60 60
+#define HP_CURSOR_Y100 100
 
 class Homepage {
     public:
@@ -21,7 +20,6 @@ class Homepage {
         void HomepageText(Adafruit_ILI9341 *tft);
         //void StartSending();
         void gameTimerInit();
-        void HomepageText2(Adafruit_ILI9341 tft);
     private:
 };
 

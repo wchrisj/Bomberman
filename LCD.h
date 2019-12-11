@@ -13,6 +13,10 @@
 #define LENGTH 320
 #define WIDTH 240
 
+#define TEXTSIZE2 2
+#define TEXTSIZE3 3
+#define TEXTSIZE4 4
+
 class LCD {
     public:
         LCD(Adafruit_ILI9341 *tft);
