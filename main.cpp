@@ -41,19 +41,16 @@ int main(void)	//MAIN
 {
 	sei();					// aanzetten interupts
 	Serial.begin(115200);	// Baudrate instellen
-	//nunchuk->nunchuk_get();
-	
-	
 	
 	IR ir = IR(2, 56);
 	ir.enableReceiver();				// IR ontvanger aanzetten				
 	
 	Homepage homepage = Homepage(&tft); 			// maak homepage object aan
 	Waitingpage waitingpage = Waitingpage(&tft); 	// maak waitingpage object aan
+	LCD lcd = LCD(&tft);			// maak lcd object aan
 	
 	homepage.HomepageText(&tft); 	// maak homepage scherm (1e scherm, beginscherm)
-	gameTimerInit();				// run game timer
-	LCD lcd = LCD(&tft);			// maak lcd object aan
+	gameTimerInit();				// run game timer ### zit ook in de bomber.cpp
 
 	status_t status;
 	status = notReady;	// status beginnen met notReady

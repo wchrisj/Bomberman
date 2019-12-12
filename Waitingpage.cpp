@@ -3,9 +3,6 @@
 #include "libraries/IRlib/IR.h"
 #include "libraries/Nunchuk/nunchuk.h"
 
-Waitingpage::Waitingpage(Adafruit_ILI9341 *tft) {
-    tft->begin(); // beginnen met communicatie met de library en functies
-}
 
 void Waitingpage::show(Adafruit_ILI9341 *tft){                    // Het maken van het wacht scherm
   tft->fillScreen(ILI9341_BLACK);                                 // maak scherm zwart
