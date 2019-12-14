@@ -20,9 +20,6 @@
 #define IR_RECEIVEPIN PIND2
 #define IR_SENDFREQUENTIE 56
 
-void gameTimerInit();
-void draw();
-
 //F = Flag
 //C = Counter
 volatile char F_readNunchuk = 0;
@@ -52,7 +49,7 @@ LCD lcd = LCD();
 //Elke 2ms wordt de input van de nunchuk gelezen zodat de input vlot werkt en geen delays oplevert
 //Elke 200ms kan de character een stap zetten door de nunchuk uit te lezen
 //Elke 4000ms wordt er een bom ge-explodeerd indien er een bom aanwezig is
-ISR(TIMER1_COMPA_vect) { //Elke 15ms
+ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	F_readNunchuk = 1;
 	C_readIR++;
 	if(C_readIR == IR_CHECK) {
