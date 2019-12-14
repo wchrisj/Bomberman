@@ -24,8 +24,8 @@ void IR::enableReceiver(){
     cli(); // Zet even alle interrupt uit zodat dit goed ingesteld kan worden
 
     // Zet de ontvang pin goed
-    DDRB &= ~(1 << IRsettings.receivePin);
-    PORTB &= ~(1 << IRsettings.receivePin);
+    DDRD &= ~(1 << IRsettings.receivePin);
+    PORTD &= ~(1 << IRsettings.receivePin);
 
     TCCR2A |= (1 << WGM21);  // Zet de timer op CTC mode
     TCCR2A &= ~(1 << WGM20);
@@ -198,7 +198,7 @@ void IR::sendLow(){
 
 //Timer interrupt voor het opvangen van IR signalen
 ISR (TIMER2_COMPA_vect){
-    uint8_t  irdata = (PINB & (1 << IRsettings.receivePin)) >> IRsettings.receivePin; // Lees de data in van de ontvang pin, 0 -> signaal is HIGH, 1 -> signaal is LOW
+    uint8_t  irdata = (PIND & (1 << IRsettings.receivePin)) >> IRsettings.receivePin; // Lees de data in van de ontvang pin, 0 -> signaal is HIGH, 1 -> signaal is LOW
 
     irparams.timer++;  // Zet de timer 1 hoger, voor het meten van de tijd dat het signaal LOW is
     if (irparams.rawlen >= RAWBUF)  irparams.receiveState = OVERFLOW ;  // Past de nieuwe data er niet meer bij -> Zet de status op OVERFLOW
