@@ -2,12 +2,6 @@
 #include "libraries/IRlib/IR.h"
 #include "libraries/Nunchuk/nunchuk.h"
 
-
-
-Homepage::Homepage(Adafruit_ILI9341 *tft) {
-    tft->begin(); // beginnen met communicatie met de library en functies
-}
-
 void Homepage::HomepageText(Adafruit_ILI9341 *tft){               // Het maken van het Start scherm
   tft->fillScreen(ILI9341_BLACK);                                 // maak scherm zwart
 

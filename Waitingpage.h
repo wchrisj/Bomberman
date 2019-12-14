@@ -19,7 +19,6 @@
 
 class Waitingpage {
     public:
-        Waitingpage(Adafruit_ILI9341 *tft);
         void show(Adafruit_ILI9341 *tft);  
         void cycle(Adafruit_ILI9341 *tft, uint8_t *cycle_staps);
     private:

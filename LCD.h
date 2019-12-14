@@ -42,6 +42,7 @@ class LCD {
         void drawMap();
         void drawPlayer(uint8_t x, uint16_t y, uint16_t c);
         void statusBar();
+        void fillScreen(uint16_t color);
     private:
 };
 #endif

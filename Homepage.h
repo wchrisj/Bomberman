@@ -16,7 +16,6 @@
 
 class Homepage {
     public:
-        Homepage(Adafruit_ILI9341 *tft);
         void HomepageText(Adafruit_ILI9341 *tft);
     private:
 };
