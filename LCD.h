@@ -13,6 +13,9 @@
 #define LENGTH 320
 #define WIDTH 240
 
+#define TEXTSIZE2 2
+#define TEXTSIZE3 3
+#define TEXTSIZE4 4
 //#define BG_COLOR ILI9341_BLACK
 #define BG_COLOR 0x01C0  // background kleur
 #define CRATE_SHADOW 0x5100     // voor crate
@@ -39,7 +42,7 @@ class LCD {
         void drawMap();
         void drawPlayer(uint8_t x, uint16_t y, uint16_t c);
         void statusBar();
-    
+        void fillScreen(uint16_t color);
     private:
 };
 #endif

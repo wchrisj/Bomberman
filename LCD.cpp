@@ -1,9 +1,14 @@
 #include "LCD.h"
+
 #include "bomber.h"
 
 LCD::LCD() {
     tft.begin();
-    tft.fillScreen(BG_COLOR);
+    LCD::fillScreen(BG_COLOR);
+}
+
+void LCD::fillScreen(uint16_t color) {
+    tft.fillScreen(color);
 }
 
 void LCD::drawAir(uint8_t x, uint8_t y){
@@ -19,6 +24,7 @@ void LCD::drawWall(uint8_t x, uint8_t y) {
     tft.drawPixel(x * BLOCK_SIZE, y * BLOCK_SIZE + 1, ILI9341_LIGHTGREY);
     //objects[y * 15 + x] = 1; // zet getekende muur in objecten array (maar array is hier nog niet aangemaakt)
 }
+
 
 void LCD::drawCrate(uint8_t x, uint16_t y){
   x = x * BLOCK_SIZE; // anders heel vaak "x * BLOK_SIZE" moeten doen, dit is leesbaarder (en mogenlijk sneller?)
@@ -157,6 +163,7 @@ void LCD::drawMap(){
     if (mapGenerator.map[i] == TYPE_AIR) {
       //tft.fillRect((i % MAP_WIDTH)*16, ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16, 16, 16, ILI9341_BLACK);
       //drawAir(i % MAP_WIDTH, (i-(i%MAP_WIDTH))/MAP_WIDTH); //deze is beetje gaar
+      drawAir(i % MAP_WIDTH, (i-(i%MAP_WIDTH))/MAP_WIDTH);
     }
     else if (mapGenerator.map[i] == TYPE_WALL) {
       //tft.fillRect((i % MAP_WIDTH)*16, ((i-(i%MAP_WIDTH))/MAP_WIDTH)*16, 16, 16, ILI9341_LIGHTGREY);

@@ -11,6 +11,14 @@
 #define TFT_CS 10 // TFT select pin
 #define TFT_DC  9 // TFT display/command pin
 
+typedef
+    enum STATUS{
+        notReady,
+        waiting,
+        playing
+    }
+status_t;
+
 extern Adafruit_ILI9341 tft;
 extern Character localCharacter;
 extern Character externCharacter;
