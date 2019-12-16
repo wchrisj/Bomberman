@@ -139,23 +139,31 @@ int main (void)
 			case playing:
 				// Player bewegingen
 				if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
-					C_charMove = 0;
+					C_charMove = 0; // Reset timer
+					int16_t newPos = -1;
 					if (nunchuk->status.UP == 1) {
-						localCharacter.move(Character::UP);
+						newPos = localCharacter.move(Character::UP);
 						Serial.println("UP");
 					}
 					else if (nunchuk->status.RIGHT == 1) {
-						localCharacter.move(Character::RIGHT);
+						newPos = localCharacter.move(Character::RIGHT);
 						Serial.println("RIGHT");
 					}
 					else if (nunchuk->status.DOWN == 1) {
-						localCharacter.move(Character::DOWN);
+						newPos = localCharacter.move(Character::DOWN);
 						Serial.println("DOWN");
 					}
 					else if (nunchuk->status.LEFT == 1) {
-						localCharacter.move(Character::LEFT);
+						newPos = localCharacter.move(Character::LEFT);
 						Serial.println("LEFT");
 					}
+					if(newPos >= 0){ // Is er bewogen?
+						ir.send(IDENTIFIER_PLAYER_LOC, newPos, 9);
+						ir.enableReceiver();
+						Serial.println(newPos);
+					}
+
+					// Plaats een bom
 					if (nunchuk->status.Z == 1) {
 						if(!localCharacter.bomb.exists) {
 							localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
