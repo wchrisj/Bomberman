@@ -19,6 +19,9 @@ typedef
     }
 status_t;
 
+void gameTimerInit();
+void draw();
+
 extern Adafruit_ILI9341 tft;
 extern Character localCharacter;
 extern Character externCharacter;
