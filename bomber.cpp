@@ -30,6 +30,7 @@ volatile char C_charMove = 0;
 volatile short C_bombs[1];
 volatile uint8_t C_resendStart = 0;
 volatile uint8_t cycle_staps = 0;
+volatile uint8_t F_playerDeath = 0;
 volatile status_t gameStatus;
 volatile Homepage homepage; 			// maak homepage object aan
 volatile Waitingpage waitingpage;		// maak waitingpage object aan
@@ -139,26 +140,36 @@ int main (void)
 			case playing:
 				// Player bewegingen
 				if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
-					C_charMove = 0;
+					C_charMove = 0; // Reset timer
+					int16_t newPos = -1; // -1 als er niet bewogen is, anders bevat hij de waarde van de nieuwe locatie
 					if (nunchuk->status.UP == 1) {
-						localCharacter.move(Character::UP);
+						newPos = localCharacter.move(Character::UP);
 						Serial.println("UP");
 					}
 					else if (nunchuk->status.RIGHT == 1) {
-						localCharacter.move(Character::RIGHT);
+						newPos = localCharacter.move(Character::RIGHT);
 						Serial.println("RIGHT");
 					}
 					else if (nunchuk->status.DOWN == 1) {
-						localCharacter.move(Character::DOWN);
+						newPos = localCharacter.move(Character::DOWN);
 						Serial.println("DOWN");
 					}
 					else if (nunchuk->status.LEFT == 1) {
-						localCharacter.move(Character::LEFT);
+						newPos = localCharacter.move(Character::LEFT);
 						Serial.println("LEFT");
 					}
+					if(newPos >= 0){ // Is er bewogen?
+						ir.send(IDENTIFIER_PLAYER_LOC, newPos, BITLENGTH_PLAYER_LOC);
+						ir.enableReceiver();
+						Serial.println(newPos);
+					}
+
+					// Plaats een bom
 					if (nunchuk->status.Z == 1) {
 						if(!localCharacter.bomb.exists) {
-							localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
+							uint16_t bombPos = localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
+							ir.send(IDENTIFIER_BOM_LOC, bombPos, BITLENGTH_BOM_LOC);
+							ir.enableReceiver();
 						}
 					}
 					draw();
@@ -181,12 +192,18 @@ int main (void)
 				if (C_bombs[LOCAL_PLAYER] == BOMB_EXPLODE) { //4seconden
 					C_bombs[LOCAL_PLAYER] = 0;
 					F_bombExplosion[LOCAL_PLAYER] = 0;
-					localCharacter.bomb.explodeBomb();
+					localCharacter.bomb.explodeBomb(&F_playerDeath);
 				}
 				if (C_bombs[EXTERN_PLAYER] == BOMB_EXPLODE) {
 					C_bombs[EXTERN_PLAYER] = 0;
 					F_bombExplosion[EXTERN_PLAYER] = 0;
-					externCharacter.bomb.explodeBomb();
+					externCharacter.bomb.explodeBomb(&F_playerDeath);
+				}
+
+				if(F_playerDeath){
+					F_playerDeath = 0;
+					ir.send(IDENTIFIER_PLAYER_DEAD, 0, BITLENGTH_PLAYER_DEAD);
+					ir.enableReceiver();
 				}
 			break;
 		}
