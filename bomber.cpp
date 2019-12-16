@@ -30,6 +30,7 @@ volatile char C_charMove = 0;
 volatile short C_bombs[1];
 volatile uint8_t C_resendStart = 0;
 volatile uint8_t cycle_staps = 0;
+volatile uint8_t F_playerDeath = 0;
 volatile status_t gameStatus;
 volatile Homepage homepage; 			// maak homepage object aan
 volatile Waitingpage waitingpage;		// maak waitingpage object aan
@@ -191,12 +192,18 @@ int main (void)
 				if (C_bombs[LOCAL_PLAYER] == BOMB_EXPLODE) { //4seconden
 					C_bombs[LOCAL_PLAYER] = 0;
 					F_bombExplosion[LOCAL_PLAYER] = 0;
-					localCharacter.bomb.explodeBomb();
+					localCharacter.bomb.explodeBomb(&F_playerDeath);
 				}
 				if (C_bombs[EXTERN_PLAYER] == BOMB_EXPLODE) {
 					C_bombs[EXTERN_PLAYER] = 0;
 					F_bombExplosion[EXTERN_PLAYER] = 0;
-					externCharacter.bomb.explodeBomb();
+					externCharacter.bomb.explodeBomb(&F_playerDeath);
+				}
+
+				if(F_playerDeath){
+					F_playerDeath = 0;
+					ir.send(IDENTIFIER_PLAYER_DEAD, 0, BITLENGTH_PLAYER_DEAD);
+					ir.enableReceiver();
 				}
 			break;
 		}

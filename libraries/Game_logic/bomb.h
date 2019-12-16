@@ -9,7 +9,7 @@ public:
 	char bomb_range;						//		    1
 	short bomb_area[BOMB_TILES];			//		8 7 0 3 4
 	uint16_t placeBomb(short _x, short _y);		//		    5
-	void explodeBomb();						//		    6
+	void explodeBomb(uint8_t *flag);						//		    6
 	void calculateBombRange();
 	bool exists;
 private:

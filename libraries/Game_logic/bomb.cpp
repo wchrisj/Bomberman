@@ -14,13 +14,14 @@ uint16_t Bomb::placeBomb(short _x, short _y) {
 	Serial.println("BOMB_PLACED");
 }
 
-void Bomb::explodeBomb() {
+void Bomb::explodeBomb(uint8_t *flag) {
 	for(char i = 0; i < BOMB_TILES; i++) {
 		uint8_t type = mapGenerator.map[bomb_area[i]];	
 		if(type == TYPE_CRATE) {
 			mapGenerator.map[bomb_area[i]] = 0;
 		} else if(type == TYPE_LOCALPLAYER) {
 			localCharacter.health--;
+			*flag = 1;
 		} else if(type == TYPE_EXTERNPLAYER) {
 			externCharacter.health--;
 		}
