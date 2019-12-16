@@ -197,13 +197,11 @@ int main (void)
 
 //Initalizeer timer1 voor de gameclock naar Compare A register elke 2ms
 void gameTimerInit() {
-	TCCR1A = 0; 
-	TCCR1B = 0; 
-	TCNT1  = 0;
-	OCR1A = 31999;
-	TCCR1B |= (1 << WGM12);
-	TCCR1B |= (1 << CS10);
-	TIMSK1 |= (1 << OCIE1A);
+	TCNT1  = 0;						// Zet de eigen counter op 0
+	OCR1A = 31999;					// Zet de top op 31999
+	TCCR1B |= (1 << WGM12);			// Zet op CTC mode
+	TCCR1B |= (1 << CS10);			// Zet prescaler = 1 (geen prescaler)
+	TIMSK1 |= (1 << OCIE1A);		// Zet de interrupt aan
 }
 
 void draw() {
