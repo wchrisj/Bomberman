@@ -19,6 +19,12 @@
 #define IDENTIFIER_BOM_LOC 2
 #define IDENTIFIER_PLAYER_DEAD 3
 
+#define BITLENGTH_MAP 16
+#define BITLENGTH_START 0
+#define BITLENGTH_PLAYER_LOC 9
+#define BITLENGTH_BOM_LOC 9
+#define BITLENGTH_PLAYER_DEAD 0
+
 #define USECPERTICK 50 // Hoeveel tijd zit er tussen de metingen?
 #define GAP_TICKS 100 // Hoeveel ticks mag het signaal achter elkaar LOW zijn, als er geen data verstuurt word is het signaal LOW
 #define MAX_ZERO_VALUE 900 // Wat is de hoogste waarde die een 0 mag hebben -> hoger is het een 1

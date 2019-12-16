@@ -158,7 +158,7 @@ int main (void)
 						Serial.println("LEFT");
 					}
 					if(newPos >= 0){ // Is er bewogen?
-						ir.send(IDENTIFIER_PLAYER_LOC, newPos, 9);
+						ir.send(IDENTIFIER_PLAYER_LOC, newPos, BITLENGTH_PLAYER_LOC);
 						ir.enableReceiver();
 						Serial.println(newPos);
 					}
@@ -166,7 +166,9 @@ int main (void)
 					// Plaats een bom
 					if (nunchuk->status.Z == 1) {
 						if(!localCharacter.bomb.exists) {
-							localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
+							uint16_t bombPos = localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
+							ir.send(IDENTIFIER_BOM_LOC, bombPos, BITLENGTH_BOM_LOC);
+							ir.enableReceiver();
 						}
 					}
 					draw();

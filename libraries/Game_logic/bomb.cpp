@@ -7,7 +7,7 @@
 #define convertPosition (x/BLOCK_SIZE)+(y/BLOCK_SIZE)*MAP_WIDTH	//Ruwe positie bijv 160x160 omzetten naar een positie in de map array
 
 //Update positie van de bom & zet de Flag voor de draw functie zodat die weet dat een bom wel/niet getekend moet worden
-void Bomb::placeBomb(short _x, short _y) {
+uint16_t Bomb::placeBomb(short _x, short _y) {
 	x = _x;
 	y = _y;
 	exists = true;
