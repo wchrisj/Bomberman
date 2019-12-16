@@ -12,6 +12,7 @@ uint16_t Bomb::placeBomb(short _x, short _y) {
 	y = _y;
 	exists = true;
 	Serial.println("BOMB_PLACED");
+	return convertPosition;
 }
 
 void Bomb::explodeBomb(uint8_t *flag) {
