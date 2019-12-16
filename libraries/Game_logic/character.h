@@ -10,7 +10,7 @@ public:
 	uint16_t color;
 	Bomb bomb;
 	void init(int _height, int _width, uint16_t _color);
-	void move(Direction dir);
+	int16_t move(Direction dir);
 	bool collision(Direction dir);
 private:
 };

@@ -28,37 +28,46 @@ void Character::init(int _height, int _width, uint16_t _color) {
 //Die bekijkt wat er om de speler heen staat en of de speler tegen een muur of bomb aan loopt.
 //Daarna wordt de huidige positie zwart getekend.
 //En als laatste wordt de nieuwe locatie van de speler getekend.
-void Character::move(Direction dir) {
+int16_t Character::move(Direction dir) {
 	prevY = y;
 	prevX = x;
 	if (dir == Character::UP) {
 		if (collision(Character::UP)) {
-			mapGenerator.map[convertPosition-MAP_WIDTH] = TYPE_LOCALPLAYER;
+			uint16_t newPos = convertPosition-MAP_WIDTH;
+			mapGenerator.map[newPos] = TYPE_LOCALPLAYER;
 			y -= height;
 			mapGenerator.map[convertPosition+MAP_WIDTH] = TYPE_AIR;
+			return newPos;
 		}
 	}
 	else if (dir == Character::RIGHT) {
 		if (collision(Character::RIGHT)) {
-			mapGenerator.map[convertPosition+1] = TYPE_LOCALPLAYER;
+			uint16_t newPos = convertPosition+1;
+			mapGenerator.map[newPos] = TYPE_LOCALPLAYER;
 			x += width;
 			mapGenerator.map[convertPosition-1] = TYPE_AIR;
+			return newPos;
 		}
 	}
 	else if (dir == Character::DOWN) {
 		if (collision(Character::DOWN)) {
-			mapGenerator.map[convertPosition+MAP_WIDTH] = TYPE_LOCALPLAYER;
+			uint16_t newPos = convertPosition+MAP_WIDTH;
+			mapGenerator.map[newPos] = TYPE_LOCALPLAYER;
 			y += height;
 			mapGenerator.map[convertPosition-MAP_WIDTH] = TYPE_AIR;
+			return newPos;
 		}
 	}
 	else if (dir == Character::LEFT) {
 		if (collision(Character::LEFT)) {
-			mapGenerator.map[convertPosition-1] = TYPE_LOCALPLAYER;
+			uint16_t newPos = convertPosition-1;
+			mapGenerator.map[newPos] = TYPE_LOCALPLAYER;
 			x -= width;
 			mapGenerator.map[convertPosition+1] = TYPE_AIR;
+			return newPos;
 		}
 	}
+	return -1; // Hier mag hij nooit komen
 }
 
 //Bekijkt of er in de gekozen richting een obstakel staat e.g. bom of muur.
