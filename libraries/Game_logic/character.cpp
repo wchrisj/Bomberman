@@ -33,34 +33,38 @@ int16_t Character::move(Direction dir) {
 	prevX = x;
 	if (dir == Character::UP) {
 		if (collision(Character::UP)) {
-			mapGenerator.map[convertPosition-MAP_WIDTH] = TYPE_LOCALPLAYER;
+			uint16_t newPos = convertPosition-MAP_WIDTH;
+			mapGenerator.map[newPos] = TYPE_LOCALPLAYER;
 			y -= height;
 			mapGenerator.map[convertPosition+MAP_WIDTH] = TYPE_AIR;
-			return convertPosition-MAP_WIDTH;
+			return newPos;
 		}
 	}
 	else if (dir == Character::RIGHT) {
 		if (collision(Character::RIGHT)) {
-			mapGenerator.map[convertPosition+1] = TYPE_LOCALPLAYER;
+			uint16_t newPos = convertPosition+1;
+			mapGenerator.map[newPos] = TYPE_LOCALPLAYER;
 			x += width;
 			mapGenerator.map[convertPosition-1] = TYPE_AIR;
-			return convertPosition+1;
+			return newPos;
 		}
 	}
 	else if (dir == Character::DOWN) {
 		if (collision(Character::DOWN)) {
-			mapGenerator.map[convertPosition+MAP_WIDTH] = TYPE_LOCALPLAYER;
+			uint16_t newPos = convertPosition+MAP_WIDTH;
+			mapGenerator.map[newPos] = TYPE_LOCALPLAYER;
 			y += height;
 			mapGenerator.map[convertPosition-MAP_WIDTH] = TYPE_AIR;
-			return convertPosition+MAP_WIDTH;
+			return newPos;
 		}
 	}
 	else if (dir == Character::LEFT) {
 		if (collision(Character::LEFT)) {
-			mapGenerator.map[convertPosition-1] = TYPE_LOCALPLAYER;
+			uint16_t newPos = convertPosition-1;
+			mapGenerator.map[newPos] = TYPE_LOCALPLAYER;
 			x -= width;
 			mapGenerator.map[convertPosition+1] = TYPE_AIR;
-			return convertPosition-1;
+			return newPos;
 		}
 	}
 	return -1; // Hier mag hij nooit komen
