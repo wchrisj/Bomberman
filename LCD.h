@@ -16,6 +16,9 @@
 #define TEXTSIZE2 2
 #define TEXTSIZE3 3
 #define TEXTSIZE4 4
+#define TEXTSIZE5 5
+#define TEXTSIZE6 6
+#define TEXTSIZE7 7
 //#define BG_COLOR ILI9341_BLACK
 #define BG_COLOR 0x01C0  // background kleur
 #define CRATE_SHADOW 0x5100     // voor crate
