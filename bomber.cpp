@@ -1,3 +1,4 @@
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -8,6 +9,7 @@
 #include "bomber.h"
 #include "Homepage.h"
 #include "Waitingpage.h"
+#include "FinalScreen.h"
 
 #define CHARACTER_MOVE 100
 #define BOMB_EXPLODE 2000
@@ -44,6 +46,7 @@ Map mapGenerator;
 
 
 LCD lcd = LCD();
+FinalScreen finalscreen = FinalScreen();
 
 //Game loop is 2 ms. Timer1 beheert dit.
 //Elke 2ms wordt de input van de nunchuk gelezen zodat de input vlot werkt en geen delays oplevert
@@ -161,6 +164,13 @@ int main (void)
 							localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
 						}
 					}
+					if(localCharacter.health == 0){
+						finalscreen.LoseScreen(&tft);
+						 if(localCharacter.health > 0){
+							finalscreen.WinScreen(&tft);
+						}
+					}
+
 					draw();
 				}
 
