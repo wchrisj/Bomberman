@@ -1,4 +1,3 @@
-
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -15,7 +14,7 @@
 #define BOMB_EXPLODE 2000
 #define BOMB_EXPLOSION 1500
 #define COUNTER_RESEND_START 100
-#define IR_CHECK 40
+#define IR_CHECK 50
 #define LOCAL_PLAYER 0
 #define EXTERN_PLAYER 1
 
@@ -85,6 +84,8 @@ int main (void)
 
 	gameTimerInit();
 
+	uint16_t mapSeed = 0;
+
 	while (1)
 	{
 		//Wire van nunchuk gebruikt een ISR. ISR in ISR mag niet.
@@ -98,7 +99,37 @@ int main (void)
 
 		if(F_readIR == 1) {
 			if(ir.decode()){			// IR uitlezen
-				identifierReceived = 1;	// identifierReceived aanzetten
+				switch(ir.results.identifier){
+					case IDENTIFIER_START:
+						identifierReceived = 1;	// identifierReceived aanzetten
+						break;
+					case IDENTIFIER_PLAYER_LOC:
+						if(gameStatus == playing){
+							if(mapGenerator.map[ir.results.data] == TYPE_WALL){
+								break;
+							}
+							for(uint16_t i = 0; i < MAP_SIZE; i++){
+								if(mapGenerator.map[i] == TYPE_EXTERNPLAYER){
+									mapGenerator.map[i] = TYPE_AIR; // De oude locatie van de andere speler is nu leeg(lucht)
+									lcd.drawAir(i % MAP_WIDTH, (i-(i % MAP_WIDTH))/MAP_WIDTH);
+								}
+							}
+							mapGenerator.map[ir.results.data] = TYPE_EXTERNPLAYER;
+							
+							externCharacter.x = (ir.results.data % MAP_WIDTH)*BLOCK_SIZE;
+							externCharacter.y = ((ir.results.data-(externCharacter.x/BLOCK_SIZE))/ MAP_WIDTH)*BLOCK_SIZE;
+							Serial.println(externCharacter.x);
+						}
+						if(gameStatus == waiting){
+							mapSeed = ir.results.data;
+						}
+						break;
+					// case IDENTIFIER_BOM_LOC:
+					// 	break;
+					// case IDENTIFIER_PLAYER_DEAD:
+					// 	break;
+
+				}
 				ir.resumeReceiver();	// gaat volgende signaal lezen
 			}
 			F_readIR = 0;
@@ -121,7 +152,8 @@ int main (void)
 						lcd.fillScreen(BG_COLOR);
 						mapGenerator.createMap(0xFFFF);
 						lcd.drawMap();
-						localCharacter.init(16, 16, ILI9341_YELLOW);
+						localCharacter.init(16, 16, ILI9341_YELLOW, TYPE_LOCALPLAYER);
+						externCharacter.init(16, 16, ILI9341_YELLOW, TYPE_EXTERNPLAYER);
 						lcd.statusBar();
 					}
 				} else if(C_resendStart == COUNTER_RESEND_START){ // Opnieuw een startsignaal versturen?
@@ -147,24 +179,19 @@ int main (void)
 					int16_t newPos = -1; // -1 als er niet bewogen is, anders bevat hij de waarde van de nieuwe locatie
 					if (nunchuk->status.UP == 1) {
 						newPos = localCharacter.move(Character::UP);
-						Serial.println("UP");
 					}
 					else if (nunchuk->status.RIGHT == 1) {
 						newPos = localCharacter.move(Character::RIGHT);
-						Serial.println("RIGHT");
 					}
 					else if (nunchuk->status.DOWN == 1) {
 						newPos = localCharacter.move(Character::DOWN);
-						Serial.println("DOWN");
 					}
 					else if (nunchuk->status.LEFT == 1) {
 						newPos = localCharacter.move(Character::LEFT);
-						Serial.println("LEFT");
 					}
 					if(newPos >= 0){ // Is er bewogen?
 						ir.send(IDENTIFIER_PLAYER_LOC, newPos, BITLENGTH_PLAYER_LOC);
 						ir.enableReceiver();
-						Serial.println(newPos);
 					}
 
 					// Plaats een bom
@@ -239,6 +266,7 @@ void draw() {
 	}
   
 	lcd.drawPlayer(localCharacter.x / BLOCK_SIZE, localCharacter.y / BLOCK_SIZE, PLAYER_1); // mss later eerst nieuwe tekenen en dan pas oude weghalen
+	lcd.drawPlayer(externCharacter.x / BLOCK_SIZE, externCharacter.y / BLOCK_SIZE, PLAYER_2); // mss later eerst nieuwe tekenen en dan pas oude weghalen
 	//Tekent de bom van localCharacter op het scherm
 
 	if(localCharacter.bomb.exists == true) {
@@ -279,6 +307,9 @@ void draw() {
 					break;
 				case TYPE_LOCALPLAYER:
 					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_1);
+					break;
+				case TYPE_EXTERNPLAYER:
+					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_2);
 					break;
 			}
 		}
