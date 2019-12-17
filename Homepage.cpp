@@ -13,5 +13,5 @@ void Homepage::HomepageText(Adafruit_ILI9341 *tft){               // Het maken v
   tft->print("Ready?");                                           // tekst printen
   tft->setCursor(HP_CURSOR_X10, HP_CURSOR_Y100);                  // zet cursor op x10 en y100
   tft->setTextColor(ILI9341_WHITE);  tft->setTextSize(TEXTSIZE2); // tekst grote en kleur kiezen
-  tft->print("Gebruik een knop op de controller om te beginnen"); // tekst printen
+  tft->print("Gebruik de 'C' knop op de controller om te beginnen"); // tekst printen
 }
