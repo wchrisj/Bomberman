@@ -204,15 +204,19 @@ int main (void)
 							ir.enableReceiver();
 						}
 					}
+					draw();
 					if(localCharacter.health == 0){
 						finalscreen.LoseScreen(&tft);
 						gameStatus = notReady;
-						 if(localCharacter.health > 0){
-							finalscreen.WinScreen(&tft);
-						}
+						_delay_ms(5000);
+						homepage.HomepageText(&tft);
 					}
-
-					draw();
+					if(localCharacter.health > 0 && externCharacter.health <= 0){
+						finalscreen.WinScreen(&tft);
+						gameStatus = notReady;
+						_delay_ms(5000);
+						homepage.HomepageText(&tft);
+					}
 				}
 
 				// Bommen
