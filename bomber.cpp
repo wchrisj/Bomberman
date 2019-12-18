@@ -124,8 +124,10 @@ int main (void)
 							mapSeed = ir.results.data;
 						}
 						break;
-					// case IDENTIFIER_BOM_LOC:
-					// 	break;
+					case IDENTIFIER_BOM_LOC:
+						externCharacter.bomb.placeBomb((ir.results.data % MAP_WIDTH)*BLOCK_SIZE, (ir.results.data-((ir.results.data % MAP_WIDTH))/ MAP_WIDTH*BLOCK_SIZE));
+						// externCharacter.bomb.placeBomb(48, 48);
+						break;
 					// case IDENTIFIER_PLAYER_DEAD:
 					// 	break;
 
@@ -204,6 +206,7 @@ int main (void)
 					}
 					if(localCharacter.health == 0){
 						finalscreen.LoseScreen(&tft);
+						gameStatus = notReady;
 						 if(localCharacter.health > 0){
 							finalscreen.WinScreen(&tft);
 						}
@@ -260,6 +263,7 @@ void gameTimerInit() {
 
 void draw() {
 	localCharacter.bomb.calculateBombRange();
+	externCharacter.bomb.calculateBombRange();
 	//Tekent localCharacter op het scherm.
 	if((localCharacter.prevX != localCharacter.x) || (localCharacter.prevY != localCharacter.y)) {	
 		lcd.drawAir(localCharacter.prevX / BLOCK_SIZE, localCharacter.prevY / BLOCK_SIZE);
@@ -295,6 +299,51 @@ void draw() {
 			short y = ((localCharacter.bomb.bomb_area[i] - (localCharacter.bomb.bomb_area[i] % MAP_WIDTH)) / MAP_WIDTH) * BLOCK_SIZE;
 
 			char type = mapGenerator.map[localCharacter.bomb.bomb_area[i]]; //Lees uit wat voor type het object is volgens de map
+			switch(type) {
+				case TYPE_AIR:
+					lcd.drawAir(x / BLOCK_SIZE, y / BLOCK_SIZE);
+					break;
+				case TYPE_WALL:
+					lcd.drawWall(x / BLOCK_SIZE, y / BLOCK_SIZE);
+					break;
+				case TYPE_CRATE:
+					lcd.drawCrate(x / BLOCK_SIZE, y / BLOCK_SIZE);
+					break;
+				case TYPE_LOCALPLAYER:
+					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_1);
+					break;
+				case TYPE_EXTERNPLAYER:
+					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_2);
+					break;
+			}
+		}
+	}
+
+	if(externCharacter.bomb.exists == true) {
+		if(F_bombExplosion[EXTERN_PLAYER] == 1) {
+			for(char i = 0; i < BOMB_TILES; i++ ) {
+				//Teken elk blokje rood tenzij het -1 is.
+				if(externCharacter.bomb.bomb_area[i] != -1) {
+					short x = (externCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
+					short y = ((externCharacter.bomb.bomb_area[i] - (externCharacter.bomb.bomb_area[i] % MAP_WIDTH)) / MAP_WIDTH) * BLOCK_SIZE;
+					if(externCharacter.bomb.bomb_area[i+1] == -1 && i % 2 == 1) {
+						lcd.drawExplosion(x / BLOCK_SIZE, y / BLOCK_SIZE, i+1);
+					} else {
+						lcd.drawExplosion(x / BLOCK_SIZE, y / BLOCK_SIZE, i);
+					}
+				}
+			}
+		} else {
+			//Bom is geplaatst maar nog niet ge-explodeerd
+			lcd.drawBomb(externCharacter.bomb.x / BLOCK_SIZE, externCharacter.bomb.y / BLOCK_SIZE);
+		}
+	} else {
+		//Bom bestaat niet, dus teken elk blokje de juiste kleur volgens de map
+		for(char i = 0; i < BOMB_TILES; i++ ) {
+			short x = (externCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
+			short y = ((externCharacter.bomb.bomb_area[i] - (externCharacter.bomb.bomb_area[i] % MAP_WIDTH)) / MAP_WIDTH) * BLOCK_SIZE;
+
+			char type = mapGenerator.map[externCharacter.bomb.bomb_area[i]]; //Lees uit wat voor type het object is volgens de map
 			switch(type) {
 				case TYPE_AIR:
 					lcd.drawAir(x / BLOCK_SIZE, y / BLOCK_SIZE);
