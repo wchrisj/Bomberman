@@ -14,7 +14,7 @@
 #define BOMB_EXPLODE 2000
 #define BOMB_EXPLOSION 1500
 #define COUNTER_RESEND_START 100
-#define IR_CHECK 50
+#define IR_CHECK 75
 #define LOCAL_PLAYER 0
 #define EXTERN_PLAYER 1
 
@@ -32,6 +32,8 @@ volatile short C_bombs[1];
 volatile uint8_t C_resendStart = 0;
 volatile uint8_t cycle_staps = 0;
 volatile uint8_t F_playerDeath = 0;
+volatile uint8_t F_Test = 0;
+volatile uint8_t F_Test2 = 0;
 volatile status_t gameStatus;
 volatile Homepage homepage; 			// maak homepage object aan
 volatile Waitingpage waitingpage;		// maak waitingpage object aan
@@ -55,6 +57,7 @@ FinalScreen finalscreen = FinalScreen();
 ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	F_readNunchuk = 1;
 	C_readIR++;
+	F_Test++;
 	if(C_readIR == IR_CHECK) {
 		F_readIR = 1;
 		C_readIR = 0;
@@ -85,6 +88,7 @@ int main (void)
 	gameTimerInit();
 
 	uint16_t mapSeed = 0;
+	uint8_t seedCreator = 1;
 
 	while (1)
 	{
@@ -101,28 +105,34 @@ int main (void)
 			if(ir.decode()){			// IR uitlezen
 				switch(ir.results.identifier){
 					case IDENTIFIER_START:
+						// if(gameStatus == playing){
+						// 	break;
+						// }
+						seedCreator = 0;
+						mapSeed = ir.results.data;
+						mapGenerator.createMap(mapSeed);
 						identifierReceived = 1;	// identifierReceived aanzetten
 						break;
 					case IDENTIFIER_PLAYER_LOC:
-						if(gameStatus == playing){
-							if(mapGenerator.map[ir.results.data] == TYPE_WALL){
-								break;
-							}
-							for(uint16_t i = 0; i < MAP_SIZE; i++){
-								if(mapGenerator.map[i] == TYPE_EXTERNPLAYER){
-									mapGenerator.map[i] = TYPE_AIR; // De oude locatie van de andere speler is nu leeg(lucht)
-									lcd.drawAir(i % MAP_WIDTH, (i-(i % MAP_WIDTH))/MAP_WIDTH);
-								}
-							}
-							mapGenerator.map[ir.results.data] = TYPE_EXTERNPLAYER;
-							
-							externCharacter.x = (ir.results.data % MAP_WIDTH)*BLOCK_SIZE;
-							externCharacter.y = ((ir.results.data-(externCharacter.x/BLOCK_SIZE))/ MAP_WIDTH)*BLOCK_SIZE;
-							Serial.println(externCharacter.x);
+						//if(gameStatus == checking){
+						gameStatus = playing;
+						Serial.println("$");
+					//	}
+						if(mapGenerator.map[ir.results.data] == TYPE_WALL){
+							break;
 						}
-						if(gameStatus == waiting){
-							mapSeed = ir.results.data;
+						for(uint16_t i = 0; i < MAP_SIZE; i++){
+							if(mapGenerator.map[i] == TYPE_EXTERNPLAYER){
+								mapGenerator.map[i] = TYPE_AIR; // De oude locatie van de andere speler is nu leeg(lucht)
+								lcd.drawAir(i % MAP_WIDTH, (i-(i % MAP_WIDTH))/MAP_WIDTH);
+							}
+						//Serial.println(externCharacter.x);
 						}
+						mapGenerator.map[ir.results.data] = TYPE_EXTERNPLAYER;
+						
+						externCharacter.x = (ir.results.data % MAP_WIDTH)*BLOCK_SIZE;
+						externCharacter.y = ((ir.results.data-(externCharacter.x/BLOCK_SIZE))/ MAP_WIDTH)*BLOCK_SIZE;
+						
 						break;
 					case IDENTIFIER_BOM_LOC:
 						externCharacter.bomb.placeBomb((ir.results.data % MAP_WIDTH)*BLOCK_SIZE, (ir.results.data-((ir.results.data % MAP_WIDTH))/ MAP_WIDTH*BLOCK_SIZE));
@@ -136,7 +146,6 @@ int main (void)
 			}
 			F_readIR = 0;
 		}
-
 		switch(gameStatus){
 			case notReady:								// als status is notReady, dan
 				if (nunchuk->status.C == 1){			// kijken of de Z is ingedrukt met de Nunchuk
@@ -149,15 +158,18 @@ int main (void)
 			
 			case waiting:											// Als de status waiting is, dan
 				if(identifierReceived){								// De ontvangen data decoderen zodat er iets mee gedaan kan worden
-					if(ir.results.identifier == IDENTIFIER_START){ 	// Als het IR signaal een start identifier stuurt
-						gameStatus = playing;						// dan, Zet status om naar playing
+					//if(ir.results.identifier == IDENTIFIER_START){ 	// Als het IR signaal een start identifier stuurt
+						//ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
+						//_delay_ms(600);// Vage comment, dit is heel belangrijk
+						ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
+						ir.enableReceiver();					// Zet de IR-ontvanger aan
+						gameStatus = checking;						// dan, Zet status om naar playing
 						lcd.fillScreen(BG_COLOR);
-						mapGenerator.createMap(0xFFFF);
 						lcd.drawMap();
 						localCharacter.init(16, 16, ILI9341_YELLOW, TYPE_LOCALPLAYER);
 						externCharacter.init(16, 16, ILI9341_YELLOW, TYPE_EXTERNPLAYER);
 						lcd.statusBar();
-					}
+					//}
 				} else if(C_resendStart == COUNTER_RESEND_START){ // Opnieuw een startsignaal versturen?
 					C_resendStart = 0; 
 					cycle_staps++;							// cycle_staps verhogen met +1
@@ -165,14 +177,33 @@ int main (void)
 						cycle_staps = 0;					// dan, cycle_staps resetten naar 0
 					}
 					waitingpage.cycle(&tft, &cycle_staps);	// functie printen van dots
-					ir.send(IDENTIFIER_START,0,0);			// Verzend IR signaal met alleen een identifier
+					Serial.println("stip");
+					if(seedCreator){ // Er er al een seed ontvangen, als niet dan ben je dus de seedCreator
+						mapSeed = 0xDFAA; // Maak een seed
+						ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
+						ir.enableReceiver();					// Zet de IR-ontvanger aan
+					}
 
-					ir.enableReceiver();					// Zet de IR-ontvanger aan
 					continue;
 				}else{
 					continue;
 				}
 				break;
+
+			case checking:
+			if(F_Test == 20){
+				ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
+				ir.enableReceiver();
+				F_Test = 0;
+				F_Test2++;
+			}
+				if(F_Test2 == 50){
+					F_Test2 = 0;
+					gameStatus = playing;
+								
+				}
+				break;
+
 			
 			case playing:
 				// Player bewegingen
@@ -205,17 +236,22 @@ int main (void)
 						}
 					}
 					draw();
+					Serial.println(localCharacter.health);
 					if(localCharacter.health == 0){
 						finalscreen.LoseScreen(&tft);
 						gameStatus = notReady;
 						_delay_ms(5000);
 						homepage.HomepageText(&tft);
+						localCharacter.health = 3;
+						externCharacter.health = 3;
 					}
-					if(localCharacter.health > 0 && externCharacter.health <= 0){
+					if(externCharacter.health == 0){
 						finalscreen.WinScreen(&tft);
 						gameStatus = notReady;
 						_delay_ms(5000);
 						homepage.HomepageText(&tft);
+						localCharacter.health = 3;
+						externCharacter.health = 3;
 					}
 				}
 

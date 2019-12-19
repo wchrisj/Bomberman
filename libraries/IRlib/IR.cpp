@@ -50,7 +50,7 @@ void IR::enableReceiver(){
 */
 uint8_t IR::decode(){
     if (irparams.receiveState != STOP){  //Dit check oP?
-        IR::resumeReceiver(); // Ga nieuwe data inlezen
+        //IR::resumeReceiver(); // Ga nieuwe data inlezen
         return 0;
     }
 
@@ -203,6 +203,7 @@ ISR (TIMER2_COMPA_vect){
     irparams.timer++;  // Zet de timer 1 hoger, voor het meten van de tijd dat het signaal LOW is
     if (irparams.rawlen >= RAWBUF)  irparams.receiveState = OVERFLOW ;  // Past de nieuwe data er niet meer bij -> Zet de status op OVERFLOW
 
+    // flag=0;
     switch(irparams.receiveState){
         case IDLE: // Is de ontvanger nergens mee bezig
             if (irdata == HIGH) { // Is er een verandering in het signaal
