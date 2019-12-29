@@ -23,6 +23,10 @@ IR::IR(uint8_t receivePin, uint8_t kHz){
 void IR::enableReceiver(){
     cli(); // Zet even alle interrupt uit zodat dit goed ingesteld kan worden
 
+    // Pin interrupt
+    EIMSK |= (1 << INT0);   // Zet de pin interrupt aan
+    EICRA |= (1 << ISC00); // Zorg dat de interrupt afgaat bij een logische verandering op de receivepin
+
     // Zet de ontvang pin goed
     DDRD &= ~(1 << IRsettings.receivePin);
     PORTD &= ~(1 << IRsettings.receivePin);
@@ -48,19 +52,19 @@ void IR::enableReceiver(){
     return 0 als er niet gedecode kan worden
     return 1 als het decoden gelukt is
 */
-uint8_t IR::decode(){
-    if (irparams.receiveState != STOP){  //Dit check oP?
-        //IR::resumeReceiver(); // Ga nieuwe data inlezen
-        return 0;
-    }
-
+uint8_t IR::decode(){    
     uint8_t dataBits = 0;
     uint16_t data = 0;
     uint8_t highBitsCounter = 0;
-    for (int i = 1; i < irparams.rawlen; i++) { //Helft van de getallen zijn verkeerd.
-        if (!(i & 1)) { //We zijn alleen geinteresseerd in tijd dat het signaal LOW is
-            if (i == 1) {
-                //Start bit
+
+    uint8_t newStartBit = 0;
+    for (int i = 0; i < irparams.rawlen; i++) { //Helft van de getallen zijn verkeerd.
+        if (i % 2 == 0) { //We zijn alleen geinteresseerd in tijd dat het signaal LOW is
+            if (irparams.rawbuf[i] >= 40) {
+                newStartBit = i;
+                if(newStartBit){ // Is dit een nieuw startbit
+                    break; // Stop met data decoden en ga verder onder de loop
+                }
             }else if (irparams.rawbuf[i] * USECPERTICK <= MAX_ZERO_VALUE) {
                 dataBits++;
             }else if (irparams.rawbuf[i] * USECPERTICK > MAX_ZERO_VALUE) {
@@ -71,6 +75,17 @@ uint8_t IR::decode(){
         }
     }
 
+    if(dataBits == 0){ // Is er helemaal geen data gevonden?
+        return 0;
+    }
+
+    if(newStartBit){ // Is er een nieuw startbit gevonden, dan alles naar rechts shiften tot het nieuwe startbit op index 0 staat
+        for(int i=0; i < irparams.rawlen-newStartBit;i++){
+            irparams.rawbuf[i] = irparams.rawbuf[i+newStartBit];
+        }
+        irparams.rawlen = irparams.rawlen-newStartBit; // Even de lengte van het buffer aanpassen
+    }
+
     dataBits--; // Het laaste bit is het parity bit en moet dus niet meetellen
 
     //Kijk is het paritybit goed is, en de data dus goed is overgekomen
@@ -79,7 +94,6 @@ uint8_t IR::decode(){
         return 0;
     }
 
-    results.parityCheck = 1;
     results.data = data & ~(1 << dataBits); // Het paritybit hoort niet bij de data
     results.data = results.data >> IDENTIFIER_LENGTH; // Eerste 2 bits zijn identifiers en geen data
     results.identifier = data & IDENTIFIER_MASK;
@@ -196,53 +210,44 @@ void IR::sendLow(){
 }
 
 
-//Timer interrupt voor het opvangen van IR signalen
-ISR (TIMER2_COMPA_vect){
+ISR(INT0_vect){ // Deze gaat af als er een verandering door de IRreceiver gevonden is
     uint8_t  irdata = (PIND & (1 << IRsettings.receivePin)) >> IRsettings.receivePin; // Lees de data in van de ontvang pin, 0 -> signaal is HIGH, 1 -> signaal is LOW
 
-    irparams.timer++;  // Zet de timer 1 hoger, voor het meten van de tijd dat het signaal LOW is
     if (irparams.rawlen >= RAWBUF)  irparams.receiveState = OVERFLOW ;  // Past de nieuwe data er niet meer bij -> Zet de status op OVERFLOW
 
-    // flag=0;
-    switch(irparams.receiveState){
-        case IDLE: // Is de ontvanger nergens mee bezig
-            if (irdata == HIGH) { // Is er een verandering in het signaal
-                if (irparams.timer < GAP_TICKS)  {  // Is het signaal lang genoeg LOW geweest -> is dit geen ruis?
-                    irparams.timer = 0;                                 // Reset de timer
-                } else {
-                    irparams.rawlen++;                                      // Zet de lengte van de buffer +1
-                    irparams.overflow                = 0;                   // Zet overflow op false
-                    irparams.rawlen                  = 0;                   // Begin opnieuw met data in het buffer te plaatsen
-                    irparams.rawbuf[irparams.rawlen] = irparams.timer;      // Sla de tijd op in het buffer
-                    irparams.timer                   = 0;                   // Start de timer opnieuw
-                    irparams.receiveState            = MARK;                // Zet de status op het meten van signaal HIGH
-                }
+    switch (irparams.receiveState){
+        case IDLE:
+            if (irparams.timer < GAP_TICKS)  {  // Is het signaal lang genoeg LOW geweest -> is dit geen ruis?
+                irparams.timer = 0;                                 // Reset de timer
+            } else {
+                irparams.rawlen++;                                      // Zet de lengte van de buffer +1
+                irparams.overflow                = 0;                   // Zet overflow op false
+                irparams.rawlen                  = 0;                   // Begin opnieuw met data in het buffer te plaatsen
+                irparams.rawbuf[irparams.rawlen] = irparams.timer;      // Sla de tijd op in het buffer
+                irparams.timer                   = 0;                   // Start de timer opnieuw
+                irparams.receiveState            = RECEIVING;                // Zet de status op het meten van signaal HIGH
             }
             break;
-        case MARK: // Wordt de tijd dat het signaal HIGH is gemeten
-            if (irdata == LOW) {   // Is het signaal niet meer HIGH -> sla dan de tijd op
-                irparams.rawbuf[irparams.rawlen++] = irparams.timer;        // Sla de tijd op
-                irparams.timer                     = 0;                     // Reset de timer zodat een nieuwe meting gedaan kan worden
-                irparams.receiveState              = SPACE;                 // Begin de signaal LOW meting
-            }
+
+        case RECEIVING:
+            irparams.rawbuf[irparams.rawlen++] = irparams.timer;        // Sla de tijd op
+            irparams.timer                     = 0;                     // Reset de timer zodat een nieuwe meting gedaan kan worden
             break;
-        case SPACE: // Wordt de tijd dat het signaal HIGH is gemeten
-            if (irdata == HIGH) {  // Is het signaal niet meer LOW -> sla dan de tijd op
-                irparams.rawbuf[irparams.rawlen++] = irparams.timer;        // Sla de tijd op
-                irparams.timer                     = 0;                     // Reset de timer zodat een nieuwe meting gedaan kan worden
-                irparams.receiveState              = MARK;                  // Begin de signaal HIGH meting
-            } else if (irparams.timer > GAP_TICKS) {  // Is het signaal lang LOW, dan wordt er geen data meer verstuurd -> zet de status op stop
-                irparams.receiveState = STOP;                               // Zet de status op STOP
-            }
-            break;
+
         case STOP:  // Is het signaal ontvangen
             if (irdata == HIGH){ // Is er verandering in het signaal
                 irparams.timer = 0 ;  // Reset de timer
             }
             break;
+
         case OVERFLOW:  // Is het buffer vol?
             irparams.overflow = 1;        // Zet overflow op true
             irparams.receiveState = STOP; // Zet de status op STOP
             break;
     }
+}
+
+//Timer interrupt voor het opvangen van IR signalen
+ISR (TIMER2_COMPA_vect){
+    irparams.timer++;  // Zet de timer 1 hoger, voor het meten van de tijd dat het signaal LOW is
 }
