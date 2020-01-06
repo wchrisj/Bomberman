@@ -210,6 +210,7 @@ int main (void)
 			case playing:
 				// Player bewegingen
 				if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
+					showLives();
 					C_charMove = 0; // Reset timer
 					int16_t newPos = -1; // -1 als er niet bewogen is, anders bevat hij de waarde van de nieuwe locatie
 					if (nunchuk->status.UP == 1) {
