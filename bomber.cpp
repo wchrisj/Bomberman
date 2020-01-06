@@ -9,6 +9,7 @@
 #include "Homepage.h"
 #include "Waitingpage.h"
 #include "FinalScreen.h"
+#include <Wire.h>
 
 #define CHARACTER_MOVE 100
 #define BOMB_EXPLODE 2000
@@ -39,6 +40,7 @@ volatile bool locDeleteBomb = false;
 volatile status_t gameStatus;
 volatile Homepage homepage; 			// maak homepage object aan
 volatile Waitingpage waitingpage;		// maak waitingpage object aan
+volatile uint8_t PE_data = 0b00000000;	// data die naar PE word gestuurd
 
 //Singleton design pattern
 //https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
@@ -211,6 +213,7 @@ int main (void)
 			case playing:
 				// Player bewegingen
 				if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
+					showLives();
 					C_charMove = 0; // Reset timer
 					int16_t newPos = -1; // -1 als er niet bewogen is, anders bevat hij de waarde van de nieuwe locatie
 					if (nunchuk->status.UP == 1) {
@@ -409,4 +412,30 @@ void draw() {
 			}
 		}
 	}
+}
+
+void showLives() {
+	if (localCharacter.health < 3){
+		PE_data |= (1<< P1_3);
+		if (localCharacter.health < 2){
+			PE_data |= (1<< P1_2);
+			if (localCharacter.health < 1){
+				PE_data |= (1<< P1_1);
+			}
+		}
+	}
+
+	if (externCharacter.health < 3){
+		PE_data |= (1<< P2_3);
+		if (externCharacter.health < 2){
+			PE_data |= (1<< P2_2);
+			if (externCharacter.health < 1){
+				PE_data |= (1<< P2_1);
+			}
+		}
+	}
+
+	Wire.beginTransmission(PE);
+	Wire.write(PE_data);
+    Wire.endTransmission();
 }
