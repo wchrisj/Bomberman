@@ -8,8 +8,8 @@
 #define TIME_1 1200     // De tijd dat het signaal LOW is voor een 1
 #define TIME_START 2400 // De tijd dat het signaal LOW is voor een startbit
 
-#define HIGH 0 // Bij infrarood communicatie is het signaal 'HIGH', voor de leesbaarheid is het in deze library omgekeerd
-#define LOW  1
+#define HIGH 1
+#define LOW  0
 #define IDENTIFIER_MASK 0x03
 #define IDENTIFIER_LENGTH 2
 
@@ -36,10 +36,9 @@
 typedef
     enum STATE{
         IDLE,
-        MARK,     // Wordt de tijd dat het signaal HIGH is gemeten
-        SPACE,    // Wordt de tijd dat het signaal LOW is gemeten
-        STOP,     // Is de data ontvangen en klaar om gedecode te worden
-        OVERFLOW  // Is er meer data ontvangen dan er kan worden opgeslagen
+        RECEIVING,  // Is de receiver bezig met het meten van een signaal
+        STOP,       // Is de data ontvangen en klaar om gedecode te worden
+        OVERFLOW    // Is er meer data ontvangen dan er kan worden opgeslagen
     }
 state_t;
 
@@ -48,7 +47,6 @@ typedef
         uint8_t  identifier;   // Hier staat voor wie de data is
         uint16_t data;         // Hier staat de ontvangen data
         uint8_t  dataBits;     // Hier staat de hoeveelheid dataBits -> geen startbit, geen paritybit
-        uint8_t  parityCheck;  // Hier staat als het paritybit klopt
     }
 decoderesults_t;
 

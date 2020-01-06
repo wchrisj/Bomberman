@@ -9,7 +9,7 @@ public:
 	char health;
 	uint16_t color;
 	Bomb bomb;
-	void init(int _height, int _width, uint16_t _color);
+	void init(int _height, int _width, uint16_t _color, uint8_t _player);
 	int16_t move(Direction dir);
 	bool collision(Direction dir);
 private:

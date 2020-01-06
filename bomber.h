@@ -15,6 +15,7 @@ typedef
     enum STATUS{
         notReady,
         waiting,
+        checking,
         playing
     }
 status_t;

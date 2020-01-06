@@ -8,14 +8,14 @@
 void FinalScreen::WinScreen(Adafruit_ILI9341 *tft){               // Het maken van het Start scherm
   tft->fillScreen(ILI9341_BLACK);                                 // maak scherm zwart
 
-  tft->setCursor(TBX_YOU_shadow, TBY_YOU_shadow);                   
+  tft->setCursor(TBX_YOU_SHADOW, TBY_YOU_SHADOW);                   
   tft->setTextColor(ILI9341_ORANGE);  tft->setTextSize(TEXTSIZE7);  // tekst grote en kleur kiezen
   tft->print("YOU");                                        // tekst printen
   tft->setCursor(TBX_YOU, TBY_YOU);                                         
   tft->setTextColor(ILI9341_YELLOW);  tft->setTextSize(TEXTSIZE7);   // tekst grote en kleur kiezen
   tft->print("YOU");   
 
-  tft->setCursor(TBX_WIN_shadow, TBY_WIN_shadow);                  
+  tft->setCursor(TBX_WIN_SHADOW, TBY_WIN_SHADOW);                  
   tft->setTextColor(ILI9341_YELLOW);  tft->setTextSize(TEXTSIZE6); // tekst grote en kleur kiezen
   tft->print("WIN!"); // tekst printen
   tft->setCursor(TBX_WIN, TBY_WIN);                  
@@ -32,14 +32,14 @@ void FinalScreen::WinScreen(Adafruit_ILI9341 *tft){               // Het maken v
 void FinalScreen::LoseScreen(Adafruit_ILI9341 *tft){               // Het maken van het Start scherm
   tft->fillScreen(ILI9341_BLACK);                                 // maak scherm zwart
 
-  tft->setCursor(TBX_YOU_shadow, TBY_YOU_shadow);                  
+  tft->setCursor(TBX_YOU_SHADOW, TBY_YOU_SHADOW);                  
   tft->setTextColor(ILI9341_ORANGE);  tft->setTextSize(TEXTSIZE7);  // tekst grote en kleur kiezen
   tft->print("YOU");                                        // tekst printen
   tft->setCursor(TBX_YOU, TBY_YOU);                                       
   tft->setTextColor(ILI9341_YELLOW);  tft->setTextSize(TEXTSIZE7);   // tekst grote en kleur kiezen
   tft->print("YOU"); 
 
-  tft->setCursor(TBX_LOSE_shadow, TBY_LOSE_shadow);                  // zet cursor op x10 en y100
+  tft->setCursor(TBX_LOSE_SHADOW, TBY_LOSE_SHADOW);                  // zet cursor op x10 en y100
   tft->setTextColor(ILI9341_ORANGE);  tft->setTextSize(TEXTSIZE6); // tekst grote en kleur kiezen
   tft->print("LOSE"); // tekst printen
   tft->setCursor(TBX_LOSE, TBY_LOSE);                  // zet cursor op x10 en y100
