@@ -10,18 +10,18 @@
 
 #define TBX_YOU 62  //Text Begin X-as
 #define TBY_YOU 61
-#define TBX_YOU_shadow 60
-#define TBY_YOU_shadow 60
+#define TBX_YOU_SHADOW 60
+#define TBY_YOU_SHADOW 60
 
 #define TBX_WIN 62  //Text Begin X-as
 #define TBY_WIN 141
-#define TBX_WIN_shadow 60
-#define TBY_WIN_shadow 140
+#define TBX_WIN_SHADOW 60
+#define TBY_WIN_SHADOW 140
 
 #define TBX_LOSE 62  //Text Begin X-as
 #define TBY_LOSE 141
-#define TBX_LOSE_shadow 60
-#define TBY_LOSE_shadow 140
+#define TBX_LOSE_SHADOW 60
+#define TBY_LOSE_SHADOW 140
 
 #define SMILEY_X 120
 #define SMILEY_Y 250

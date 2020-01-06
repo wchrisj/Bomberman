@@ -1,4 +1,3 @@
-
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -15,7 +14,7 @@
 #define BOMB_EXPLODE 2000
 #define BOMB_EXPLOSION 1500
 #define COUNTER_RESEND_START 100
-#define IR_CHECK 40
+#define IR_CHECK 75
 #define LOCAL_PLAYER 0
 #define EXTERN_PLAYER 1
 
@@ -33,6 +32,8 @@ volatile short C_bombs[1];
 volatile uint8_t C_resendStart = 0;
 volatile uint8_t cycle_staps = 0;
 volatile uint8_t F_playerDeath = 0;
+volatile uint8_t F_Test = 0;
+volatile uint8_t F_Test2 = 0;
 volatile status_t gameStatus;
 volatile Homepage homepage; 			// maak homepage object aan
 volatile Waitingpage waitingpage;		// maak waitingpage object aan
@@ -56,6 +57,7 @@ FinalScreen finalscreen = FinalScreen();
 ISR(TIMER1_COMPA_vect) { //Elke 2ms
 	F_readNunchuk = 1;
 	C_readIR++;
+	F_Test++;
 	if(C_readIR == IR_CHECK) {
 		F_readIR = 1;
 		C_readIR = 0;
@@ -85,6 +87,9 @@ int main (void)
 
 	gameTimerInit();
 
+	uint16_t mapSeed = 0;
+	uint8_t seedCreator = 1;
+
 	while (1)
 	{
 		//Wire van nunchuk gebruikt een ISR. ISR in ISR mag niet.
@@ -98,12 +103,49 @@ int main (void)
 
 		if(F_readIR == 1) {
 			if(ir.decode()){			// IR uitlezen
-				identifierReceived = 1;	// identifierReceived aanzetten
+				switch(ir.results.identifier){
+					case IDENTIFIER_START:
+						// if(gameStatus == playing){
+						// 	break;
+						// }
+						seedCreator = 0;
+						mapSeed = ir.results.data;
+						mapGenerator.createMap(mapSeed);
+						identifierReceived = 1;	// identifierReceived aanzetten
+						break;
+					case IDENTIFIER_PLAYER_LOC:
+						//if(gameStatus == checking){
+						gameStatus = playing;
+						Serial.println("$");
+					//	}
+						if(mapGenerator.map[ir.results.data] == TYPE_WALL){
+							break;
+						}
+						for(uint16_t i = 0; i < MAP_SIZE; i++){
+							if(mapGenerator.map[i] == TYPE_EXTERNPLAYER){
+								mapGenerator.map[i] = TYPE_AIR; // De oude locatie van de andere speler is nu leeg(lucht)
+								lcd.drawAir(i % MAP_WIDTH, (i-(i % MAP_WIDTH))/MAP_WIDTH);
+							}
+						//Serial.println(externCharacter.x);
+						}
+						mapGenerator.map[ir.results.data] = TYPE_EXTERNPLAYER;
+						
+						externCharacter.x = (ir.results.data % MAP_WIDTH)*BLOCK_SIZE;
+						externCharacter.y = ((ir.results.data-(externCharacter.x/BLOCK_SIZE))/ MAP_WIDTH)*BLOCK_SIZE;
+						
+						break;
+					case IDENTIFIER_BOM_LOC:
+						externCharacter.bomb.placeBomb((ir.results.data % MAP_WIDTH)*BLOCK_SIZE, (ir.results.data-((ir.results.data % MAP_WIDTH))/ MAP_WIDTH*BLOCK_SIZE));
+						// externCharacter.bomb.placeBomb(48, 48);
+						break;
+					// case IDENTIFIER_PLAYER_DEAD:
+					// 	break;
+
+				}
 				ir.resumeReceiver();	// gaat volgende signaal lezen
 			}
 			F_readIR = 0;
 		}
-
 		switch(gameStatus){
 			case notReady:								// als status is notReady, dan
 				if (nunchuk->status.C == 1){			// kijken of de Z is ingedrukt met de Nunchuk
@@ -116,14 +158,18 @@ int main (void)
 			
 			case waiting:											// Als de status waiting is, dan
 				if(identifierReceived){								// De ontvangen data decoderen zodat er iets mee gedaan kan worden
-					if(ir.results.identifier == IDENTIFIER_START){ 	// Als het IR signaal een start identifier stuurt
-						gameStatus = playing;						// dan, Zet status om naar playing
+					//if(ir.results.identifier == IDENTIFIER_START){ 	// Als het IR signaal een start identifier stuurt
+						//ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
+						//_delay_ms(600);// Vage comment, dit is heel belangrijk
+						ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
+						ir.enableReceiver();					// Zet de IR-ontvanger aan
+						gameStatus = checking;						// dan, Zet status om naar playing
 						lcd.fillScreen(BG_COLOR);
-						mapGenerator.createMap(0xFFFF);
 						lcd.drawMap();
-						localCharacter.init(16, 16, ILI9341_YELLOW);
+						localCharacter.init(16, 16, ILI9341_YELLOW, TYPE_LOCALPLAYER);
+						externCharacter.init(16, 16, ILI9341_YELLOW, TYPE_EXTERNPLAYER);
 						lcd.statusBar();
-					}
+					//}
 				} else if(C_resendStart == COUNTER_RESEND_START){ // Opnieuw een startsignaal versturen?
 					C_resendStart = 0; 
 					cycle_staps++;							// cycle_staps verhogen met +1
@@ -131,14 +177,33 @@ int main (void)
 						cycle_staps = 0;					// dan, cycle_staps resetten naar 0
 					}
 					waitingpage.cycle(&tft, &cycle_staps);	// functie printen van dots
-					ir.send(IDENTIFIER_START,0,0);			// Verzend IR signaal met alleen een identifier
+					Serial.println("stip");
+					if(seedCreator){ // Er er al een seed ontvangen, als niet dan ben je dus de seedCreator
+						mapSeed = 0xDFAA; // Maak een seed
+						ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
+						ir.enableReceiver();					// Zet de IR-ontvanger aan
+					}
 
-					ir.enableReceiver();					// Zet de IR-ontvanger aan
 					continue;
 				}else{
 					continue;
 				}
 				break;
+
+			case checking:
+			if(F_Test == 20){
+				ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
+				ir.enableReceiver();
+				F_Test = 0;
+				F_Test2++;
+			}
+				if(F_Test2 == 50){
+					F_Test2 = 0;
+					gameStatus = playing;
+								
+				}
+				break;
+
 			
 			case playing:
 				// Player bewegingen
@@ -147,24 +212,19 @@ int main (void)
 					int16_t newPos = -1; // -1 als er niet bewogen is, anders bevat hij de waarde van de nieuwe locatie
 					if (nunchuk->status.UP == 1) {
 						newPos = localCharacter.move(Character::UP);
-						Serial.println("UP");
 					}
 					else if (nunchuk->status.RIGHT == 1) {
 						newPos = localCharacter.move(Character::RIGHT);
-						Serial.println("RIGHT");
 					}
 					else if (nunchuk->status.DOWN == 1) {
 						newPos = localCharacter.move(Character::DOWN);
-						Serial.println("DOWN");
 					}
 					else if (nunchuk->status.LEFT == 1) {
 						newPos = localCharacter.move(Character::LEFT);
-						Serial.println("LEFT");
 					}
 					if(newPos >= 0){ // Is er bewogen?
 						ir.send(IDENTIFIER_PLAYER_LOC, newPos, BITLENGTH_PLAYER_LOC);
 						ir.enableReceiver();
-						Serial.println(newPos);
 					}
 
 					// Plaats een bom
@@ -175,14 +235,24 @@ int main (void)
 							ir.enableReceiver();
 						}
 					}
+					draw();
+					Serial.println(localCharacter.health);
 					if(localCharacter.health == 0){
 						finalscreen.LoseScreen(&tft);
-						 if(localCharacter.health > 0){
-							finalscreen.WinScreen(&tft);
-						}
+						gameStatus = notReady;
+						_delay_ms(5000);
+						homepage.HomepageText(&tft);
+						localCharacter.health = 3;
+						externCharacter.health = 3;
 					}
-
-					draw();
+					if(externCharacter.health == 0){
+						finalscreen.WinScreen(&tft);
+						gameStatus = notReady;
+						_delay_ms(5000);
+						homepage.HomepageText(&tft);
+						localCharacter.health = 3;
+						externCharacter.health = 3;
+					}
 				}
 
 				// Bommen
@@ -233,12 +303,14 @@ void gameTimerInit() {
 
 void draw() {
 	localCharacter.bomb.calculateBombRange();
+	externCharacter.bomb.calculateBombRange();
 	//Tekent localCharacter op het scherm.
 	if((localCharacter.prevX != localCharacter.x) || (localCharacter.prevY != localCharacter.y)) {	
 		lcd.drawAir(localCharacter.prevX / BLOCK_SIZE, localCharacter.prevY / BLOCK_SIZE);
 	}
   
 	lcd.drawPlayer(localCharacter.x / BLOCK_SIZE, localCharacter.y / BLOCK_SIZE, PLAYER_1); // mss later eerst nieuwe tekenen en dan pas oude weghalen
+	lcd.drawPlayer(externCharacter.x / BLOCK_SIZE, externCharacter.y / BLOCK_SIZE, PLAYER_2); // mss later eerst nieuwe tekenen en dan pas oude weghalen
 	//Tekent de bom van localCharacter op het scherm
 
 	if(localCharacter.bomb.exists == true) {
@@ -279,6 +351,54 @@ void draw() {
 					break;
 				case TYPE_LOCALPLAYER:
 					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_1);
+					break;
+				case TYPE_EXTERNPLAYER:
+					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_2);
+					break;
+			}
+		}
+	}
+
+	if(externCharacter.bomb.exists == true) {
+		if(F_bombExplosion[EXTERN_PLAYER] == 1) {
+			for(char i = 0; i < BOMB_TILES; i++ ) {
+				//Teken elk blokje rood tenzij het -1 is.
+				if(externCharacter.bomb.bomb_area[i] != -1) {
+					short x = (externCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
+					short y = ((externCharacter.bomb.bomb_area[i] - (externCharacter.bomb.bomb_area[i] % MAP_WIDTH)) / MAP_WIDTH) * BLOCK_SIZE;
+					if(externCharacter.bomb.bomb_area[i+1] == -1 && i % 2 == 1) {
+						lcd.drawExplosion(x / BLOCK_SIZE, y / BLOCK_SIZE, i+1);
+					} else {
+						lcd.drawExplosion(x / BLOCK_SIZE, y / BLOCK_SIZE, i);
+					}
+				}
+			}
+		} else {
+			//Bom is geplaatst maar nog niet ge-explodeerd
+			lcd.drawBomb(externCharacter.bomb.x / BLOCK_SIZE, externCharacter.bomb.y / BLOCK_SIZE);
+		}
+	} else {
+		//Bom bestaat niet, dus teken elk blokje de juiste kleur volgens de map
+		for(char i = 0; i < BOMB_TILES; i++ ) {
+			short x = (externCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
+			short y = ((externCharacter.bomb.bomb_area[i] - (externCharacter.bomb.bomb_area[i] % MAP_WIDTH)) / MAP_WIDTH) * BLOCK_SIZE;
+
+			char type = mapGenerator.map[externCharacter.bomb.bomb_area[i]]; //Lees uit wat voor type het object is volgens de map
+			switch(type) {
+				case TYPE_AIR:
+					lcd.drawAir(x / BLOCK_SIZE, y / BLOCK_SIZE);
+					break;
+				case TYPE_WALL:
+					lcd.drawWall(x / BLOCK_SIZE, y / BLOCK_SIZE);
+					break;
+				case TYPE_CRATE:
+					lcd.drawCrate(x / BLOCK_SIZE, y / BLOCK_SIZE);
+					break;
+				case TYPE_LOCALPLAYER:
+					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_1);
+					break;
+				case TYPE_EXTERNPLAYER:
+					lcd.drawPlayer(x / BLOCK_SIZE, y / BLOCK_SIZE, PLAYER_2);
 					break;
 			}
 		}

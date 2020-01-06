@@ -7,9 +7,9 @@
 #define convertPosition (x/BLOCK_SIZE)+(y/BLOCK_SIZE)*MAP_WIDTH	//Ruwe positie bijv 160x160 omzetten naar een positie in de map array
 
 //Maakt de character zichtbaar op het scherm.
-void Character::init(int _height, int _width, uint16_t _color) {
+void Character::init(int _height, int _width, uint16_t _color, uint8_t _player) {
 	for(short i = 0; i < MAP_SIZE; i++) {
-		if(mapGenerator.map[i] == TYPE_LOCALPLAYER) {
+		if(mapGenerator.map[i] == _player) {
 			x = (i % MAP_WIDTH)*BLOCK_SIZE;
 			y = ((i-(i%MAP_WIDTH))/MAP_WIDTH)*BLOCK_SIZE;
 			prevX = x;
