@@ -140,8 +140,9 @@ int main (void)
 						externCharacter.bomb.placeBomb((ir.results.data % MAP_WIDTH)*BLOCK_SIZE, (ir.results.data-((ir.results.data % MAP_WIDTH))/ MAP_WIDTH*BLOCK_SIZE));
 						// externCharacter.bomb.placeBomb(48, 48);
 						break;
-					// case IDENTIFIER_PLAYER_DEAD:
-					// 	break;
+					case IDENTIFIER_PLAYER_DEAD:
+						externCharacter.health--;
+						break;
 
 				}
 				ir.resumeReceiver();	// gaat volgende signaal lezen
