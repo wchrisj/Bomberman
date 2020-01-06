@@ -40,7 +40,7 @@ void NunchukInput::nunchuk_get() {
 	Wire.requestFrom(NUNCHUK_ADDR, NUNCHUK_BYTES);
 	//Data opslaan
 	if (Wire.available()) {
-		for (uint8_t i = 0; i < 6 && Wire.available(); i++) {
+		for (uint8_t i = 0; i < NUNCHUK_BYTES && Wire.available(); i++) {
 			nunchuk_data[i] = Wire.read();
 		}
 		//0x00 maakt de buffer schoon voor de volgende bytes

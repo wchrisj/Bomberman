@@ -19,7 +19,7 @@
 #define EXTERN_PLAYER 1
 
 #define IR_RECEIVEPIN PIND2
-#define IR_SENDFREQUENTIE 56
+#define IR_SENDFREQUENTIE 38 //56 witte stip 38 geen stip
 
 //F = Flag
 //C = Counter
@@ -34,6 +34,8 @@ volatile uint8_t cycle_staps = 0;
 volatile uint8_t F_playerDeath = 0;
 volatile uint8_t F_Test = 0;
 volatile uint8_t F_Test2 = 0;
+volatile bool extDeleteBomb = false;
+volatile bool locDeleteBomb = false;
 volatile status_t gameStatus;
 volatile Homepage homepage; 			// maak homepage object aan
 volatile Waitingpage waitingpage;		// maak waitingpage object aan
@@ -138,8 +140,9 @@ int main (void)
 						externCharacter.bomb.placeBomb((ir.results.data % MAP_WIDTH)*BLOCK_SIZE, (ir.results.data-((ir.results.data % MAP_WIDTH))/ MAP_WIDTH*BLOCK_SIZE));
 						// externCharacter.bomb.placeBomb(48, 48);
 						break;
-					// case IDENTIFIER_PLAYER_DEAD:
-					// 	break;
+					case IDENTIFIER_PLAYER_DEAD:
+						externCharacter.health--;
+						break;
 
 				}
 				ir.resumeReceiver();	// gaat volgende signaal lezen
@@ -273,11 +276,13 @@ int main (void)
 					C_bombs[LOCAL_PLAYER] = 0;
 					F_bombExplosion[LOCAL_PLAYER] = 0;
 					localCharacter.bomb.explodeBomb(&F_playerDeath);
+					locDeleteBomb = true;
 				}
 				if (C_bombs[EXTERN_PLAYER] == BOMB_EXPLODE) {
 					C_bombs[EXTERN_PLAYER] = 0;
 					F_bombExplosion[EXTERN_PLAYER] = 0;
 					externCharacter.bomb.explodeBomb(&F_playerDeath);
+					extDeleteBomb = true;
 				}
 
 				if(F_playerDeath){
@@ -331,8 +336,8 @@ void draw() {
 			//Bom is geplaatst maar nog niet ge-explodeerd
 			lcd.drawBomb(localCharacter.bomb.x / BLOCK_SIZE, localCharacter.bomb.y / BLOCK_SIZE);
 		}
-	} else {
-
+	} else if(locDeleteBomb) {
+		locDeleteBomb = false;
 		//Bom bestaat niet, dus teken elk blokje de juiste kleur volgens de map
 		for(char i = 0; i < BOMB_TILES; i++ ) {
 			short x = (localCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
@@ -377,7 +382,8 @@ void draw() {
 			//Bom is geplaatst maar nog niet ge-explodeerd
 			lcd.drawBomb(externCharacter.bomb.x / BLOCK_SIZE, externCharacter.bomb.y / BLOCK_SIZE);
 		}
-	} else {
+	} else if(extDeleteBomb) {
+		extDeleteBomb = false;
 		//Bom bestaat niet, dus teken elk blokje de juiste kleur volgens de map
 		for(char i = 0; i < BOMB_TILES; i++ ) {
 			short x = (externCharacter.bomb.bomb_area[i] % MAP_WIDTH) * BLOCK_SIZE;
