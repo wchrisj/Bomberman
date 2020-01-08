@@ -41,6 +41,7 @@ volatile status_t gameStatus;
 volatile Homepage homepage; 			// maak homepage object aan
 volatile Waitingpage waitingpage;		// maak waitingpage object aan
 volatile uint8_t PE_data = 0b00000000;	// data die naar PE word gestuurd
+uint8_t identifierStartReceived = 0;
 
 //Singleton design pattern
 //https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
@@ -83,7 +84,6 @@ int main (void)
 	Serial.begin(9600);
 
 	gameStatus = notReady;	// status beginnen met notReady
-	uint8_t identifierReceived = 0;
 	IR ir = IR(IR_RECEIVEPIN, IR_SENDFREQUENTIE);
 	ir.enableReceiver();
 
@@ -101,72 +101,56 @@ int main (void)
 		if (F_readNunchuk == 1) {
 			nunchuk->nunchuk_get();
 			F_readNunchuk = 0;
-		} else {
-			continue;
-		}
-
-		if(F_readIR == 1) {
-			if(ir.decode()){			// IR uitlezen
-				switch(ir.results.identifier){
-					case IDENTIFIER_START:
-						// if(gameStatus == playing){
-						// 	break;
-						// }
-						seedCreator = 0;
-						mapSeed = ir.results.data;
-						mapGenerator.createMap(mapSeed);
-						identifierReceived = 1;	// identifierReceived aanzetten
-						break;
-					case IDENTIFIER_PLAYER_LOC:
-						//if(gameStatus == checking){
-						gameStatus = playing;
-						Serial.println("$");
-					//	}
-						if(mapGenerator.map[ir.results.data] == TYPE_WALL){
+			if(F_readIR == 1) {
+				if(ir.decode()){			// IR uitlezen
+					switch(ir.results.identifier){
+						case IDENTIFIER_START:
+							seedCreator = 0;
+							mapSeed = ir.results.data;
+							mapGenerator.createMap(mapSeed);
+							identifierStartReceived = 1;	// identifierStartReceived aanzetten
 							break;
-						}
-						for(uint16_t i = 0; i < MAP_SIZE; i++){
-							if(mapGenerator.map[i] == TYPE_EXTERNPLAYER){
-								mapGenerator.map[i] = TYPE_AIR; // De oude locatie van de andere speler is nu leeg(lucht)
-								lcd.drawAir(i % MAP_WIDTH, (i-(i % MAP_WIDTH))/MAP_WIDTH);
+						case IDENTIFIER_PLAYER_LOC:
+							gameStatus = playing;
+							Serial.println("$");
+							if(mapGenerator.map[ir.results.data] == TYPE_WALL){
+								break;
 							}
-						//Serial.println(externCharacter.x);
-						}
-						mapGenerator.map[ir.results.data] = TYPE_EXTERNPLAYER;
-						
-						externCharacter.x = (ir.results.data % MAP_WIDTH)*BLOCK_SIZE;
-						externCharacter.y = ((ir.results.data-(externCharacter.x/BLOCK_SIZE))/ MAP_WIDTH)*BLOCK_SIZE;
-						
-						break;
-					case IDENTIFIER_BOM_LOC:
-						externCharacter.bomb.placeBomb((ir.results.data % MAP_WIDTH)*BLOCK_SIZE, (ir.results.data-((ir.results.data % MAP_WIDTH))/ MAP_WIDTH*BLOCK_SIZE));
-						// externCharacter.bomb.placeBomb(48, 48);
-						break;
-					case IDENTIFIER_PLAYER_DEAD:
-						externCharacter.health--;
-						break;
+							for(uint16_t i = 0; i < MAP_SIZE; i++){
+								if(mapGenerator.map[i] == TYPE_EXTERNPLAYER){
+									mapGenerator.map[i] = TYPE_AIR; // De oude locatie van de andere speler is nu leeg(lucht)
+									lcd.drawAir(i % MAP_WIDTH, (i-(i % MAP_WIDTH))/MAP_WIDTH);
+								}
+							}
+							mapGenerator.map[ir.results.data] = TYPE_EXTERNPLAYER;
+							
+							externCharacter.x = (ir.results.data % MAP_WIDTH)*BLOCK_SIZE;
+							externCharacter.y = ((ir.results.data-(externCharacter.x/BLOCK_SIZE))/ MAP_WIDTH)*BLOCK_SIZE;
+							
+							break;
+						case IDENTIFIER_BOM_LOC:
+							externCharacter.bomb.placeBomb((ir.results.data % MAP_WIDTH)*BLOCK_SIZE, (ir.results.data-((ir.results.data % MAP_WIDTH))/ MAP_WIDTH*BLOCK_SIZE));
+							break;
+						case IDENTIFIER_PLAYER_DEAD:
+							externCharacter.health--;
+							break;
 
+					}
+					ir.resumeReceiver();	// gaat volgende signaal lezen
 				}
-				ir.resumeReceiver();	// gaat volgende signaal lezen
+				F_readIR = 0;
 			}
-			F_readIR = 0;
-		}
-		switch(gameStatus){
-			case notReady:								// als status is notReady, dan
-				if (nunchuk->status.C == 1){			// kijken of de Z is ingedrukt met de Nunchuk
-					gameStatus = waiting; 				// zet status op waiting
-					waitingpage.show(&tft);				// maak het wachtscherm
-				}else {
-					continue;
-				}
-				break;
-			
-			case waiting:											// Als de status waiting is, dan
-				if(identifierReceived){								// De ontvangen data decoderen zodat er iets mee gedaan kan worden
-					//if(ir.results.identifier == IDENTIFIER_START){ 	// Als het IR signaal een start identifier stuurt
-						//ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
-						//_delay_ms(600);// Vage comment, dit is heel belangrijk
-						ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
+			switch(gameStatus){
+				case notReady:								// als status is notReady, dan
+					if (nunchuk->status.C == 1){			// kijken of de Z is ingedrukt met de Nunchuk
+						gameStatus = waiting; 				// zet status op waiting
+						waitingpage.show(&tft);				// maak het wachtscherm
+					}
+					break;
+				
+				case waiting:											// Als de status waiting is, dan
+					if(identifierStartReceived){								// De ontvangen data decoderen zodat er iets mee gedaan kan worden
+						ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_START);
 						ir.enableReceiver();					// Zet de IR-ontvanger aan
 						gameStatus = checking;						// dan, Zet status om naar playing
 						lcd.fillScreen(BG_COLOR);
@@ -174,126 +158,122 @@ int main (void)
 						localCharacter.init(16, 16, ILI9341_YELLOW, TYPE_LOCALPLAYER);
 						externCharacter.init(16, 16, ILI9341_YELLOW, TYPE_EXTERNPLAYER);
 						lcd.statusBar();
-					//}
-				} else if(C_resendStart == COUNTER_RESEND_START){ // Opnieuw een startsignaal versturen?
-					C_resendStart = 0; 
-					cycle_staps++;							// cycle_staps verhogen met +1
-					if (cycle_staps == MAXDOTS){			// Als cycle_staps de maximale aantal punten heeft geprint 
-						cycle_staps = 0;					// dan, cycle_staps resetten naar 0
-					}
-					waitingpage.cycle(&tft, &cycle_staps);	// functie printen van dots
-					Serial.println("stip");
-					if(seedCreator){ // Er er al een seed ontvangen, als niet dan ben je dus de seedCreator
-						mapSeed = 0xDFAA; // Maak een seed
-						ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
-						ir.enableReceiver();					// Zet de IR-ontvanger aan
-					}
-
-					continue;
-				}else{
-					continue;
-				}
-				break;
-
-			case checking:
-			if(F_Test == 20){
-				ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_MAP);
-				ir.enableReceiver();
-				F_Test = 0;
-				F_Test2++;
-			}
-				if(F_Test2 == 50){
-					F_Test2 = 0;
-					gameStatus = playing;
-								
-				}
-				break;
-
-			
-			case playing:
-				// Player bewegingen
-				if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
-					showLives();
-					C_charMove = 0; // Reset timer
-					int16_t newPos = -1; // -1 als er niet bewogen is, anders bevat hij de waarde van de nieuwe locatie
-					if (nunchuk->status.UP == 1) {
-						newPos = localCharacter.move(Character::UP);
-					}
-					else if (nunchuk->status.RIGHT == 1) {
-						newPos = localCharacter.move(Character::RIGHT);
-					}
-					else if (nunchuk->status.DOWN == 1) {
-						newPos = localCharacter.move(Character::DOWN);
-					}
-					else if (nunchuk->status.LEFT == 1) {
-						newPos = localCharacter.move(Character::LEFT);
-					}
-					if(newPos >= 0){ // Is er bewogen?
-						ir.send(IDENTIFIER_PLAYER_LOC, newPos, BITLENGTH_PLAYER_LOC);
-						ir.enableReceiver();
-					}
-
-					// Plaats een bom
-					if (nunchuk->status.Z == 1) {
-						if(!localCharacter.bomb.exists) {
-							uint16_t bombPos = localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
-							ir.send(IDENTIFIER_BOM_LOC, bombPos, BITLENGTH_BOM_LOC);
-							ir.enableReceiver();
+					} else if(C_resendStart == COUNTER_RESEND_START){ // Opnieuw een startsignaal versturen?
+						C_resendStart = 0; 
+						cycle_staps++;							// cycle_staps verhogen met +1
+						if (cycle_staps == MAXDOTS){			// Als cycle_staps de maximale aantal punten heeft geprint 
+							cycle_staps = 0;					// dan, cycle_staps resetten naar 0
+						}
+						waitingpage.cycle(&tft, &cycle_staps);	// functie printen van dots
+						Serial.println("stip");
+						if(seedCreator){ // Er er al een seed ontvangen, als niet dan ben je dus de seedCreator
+							mapSeed = 0xDFAA; // Maak een seed
+							ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_START);
+							ir.enableReceiver();					// Zet de IR-ontvanger aan
 						}
 					}
-					draw();
-					Serial.println(localCharacter.health);
-					if(localCharacter.health == 0){
-						finalscreen.LoseScreen(&tft);
-						gameStatus = notReady;
-						_delay_ms(5000);
-						homepage.HomepageText(&tft);
-						localCharacter.health = 3;
-						externCharacter.health = 3;
-					}
-					if(externCharacter.health == 0){
-						finalscreen.WinScreen(&tft);
-						gameStatus = notReady;
-						_delay_ms(5000);
-						homepage.HomepageText(&tft);
-						localCharacter.health = 3;
-						externCharacter.health = 3;
-					}
-				}
+					break;
 
-				// Bommen
-				if(localCharacter.bomb.exists) {
-					C_bombs[LOCAL_PLAYER]++;
-					if(C_bombs[LOCAL_PLAYER] == BOMB_EXPLOSION) {
-						F_bombExplosion[LOCAL_PLAYER] = 1;
+				case checking:
+					if(F_Test == 20){
+						ir.send(IDENTIFIER_START, mapSeed, BITLENGTH_START);
+						ir.enableReceiver();
+						F_Test = 0;
+						F_Test2++;
 					}
-				}
-				if(externCharacter.bomb.exists) {
-					C_bombs[EXTERN_PLAYER]++;
-					if(C_bombs[EXTERN_PLAYER] == BOMB_EXPLOSION) {
-						F_bombExplosion[EXTERN_PLAYER] = 1;
+					if(F_Test2 == 50){
+						F_Test2 = 0;
+						gameStatus = playing;
+									
 					}
-				}
+					break;
+
 				
-				if (C_bombs[LOCAL_PLAYER] == BOMB_EXPLODE) { //4seconden
-					C_bombs[LOCAL_PLAYER] = 0;
-					F_bombExplosion[LOCAL_PLAYER] = 0;
-					localCharacter.bomb.explodeBomb(&F_playerDeath);
-					locDeleteBomb = true;
-				}
-				if (C_bombs[EXTERN_PLAYER] == BOMB_EXPLODE) {
-					C_bombs[EXTERN_PLAYER] = 0;
-					F_bombExplosion[EXTERN_PLAYER] = 0;
-					externCharacter.bomb.explodeBomb(&F_playerDeath);
-					extDeleteBomb = true;
-				}
+				case playing:
+					// Player bewegingen
+					if(C_charMove == CHARACTER_MOVE) { //200ms (100ticks * 2ms = 200ms)
+						showLives();
+						C_charMove = 0; // Reset timer
+						int16_t newPos = -1; // -1 als er niet bewogen is, anders bevat hij de waarde van de nieuwe locatie
+						if (nunchuk->status.UP == 1) {
+							newPos = localCharacter.move(Character::UP);
+						}
+						else if (nunchuk->status.RIGHT == 1) {
+							newPos = localCharacter.move(Character::RIGHT);
+						}
+						else if (nunchuk->status.DOWN == 1) {
+							newPos = localCharacter.move(Character::DOWN);
+						}
+						else if (nunchuk->status.LEFT == 1) {
+							newPos = localCharacter.move(Character::LEFT);
+						}
+						if(newPos >= 0){ // Is er bewogen?
+							ir.send(IDENTIFIER_PLAYER_LOC, newPos, BITLENGTH_PLAYER_LOC);
+							ir.enableReceiver();
+						}
 
-				if(F_playerDeath){
-					F_playerDeath = 0;
-					ir.send(IDENTIFIER_PLAYER_DEAD, 0, BITLENGTH_PLAYER_DEAD);
-					ir.enableReceiver();
-				}
-			break;
+						// Plaats een bom
+						if (nunchuk->status.Z == 1) {
+							if(!localCharacter.bomb.exists) {
+								uint16_t bombPos = localCharacter.bomb.placeBomb(localCharacter.x, localCharacter.y);
+								ir.send(IDENTIFIER_BOM_LOC, bombPos, BITLENGTH_BOM_LOC);
+								ir.enableReceiver();
+							}
+						}
+						draw();
+						Serial.println(localCharacter.health);
+						if(localCharacter.health == 0){
+							finalscreen.LoseScreen(&tft);
+							gameStatus = notReady;
+							_delay_ms(5000);
+							homepage.HomepageText(&tft);
+							localCharacter.health = 3;
+							externCharacter.health = 3;
+						}
+						if(externCharacter.health == 0){
+							finalscreen.WinScreen(&tft);
+							gameStatus = notReady;
+							_delay_ms(5000);
+							homepage.HomepageText(&tft);
+							localCharacter.health = 3;
+							externCharacter.health = 3;
+						}
+					}
+
+					// Bommen
+					if(localCharacter.bomb.exists) {
+						C_bombs[LOCAL_PLAYER]++;
+						if(C_bombs[LOCAL_PLAYER] == BOMB_EXPLOSION) {
+							F_bombExplosion[LOCAL_PLAYER] = 1;
+						}
+					}
+					if(externCharacter.bomb.exists) {
+						C_bombs[EXTERN_PLAYER]++;
+						if(C_bombs[EXTERN_PLAYER] == BOMB_EXPLOSION) {
+							F_bombExplosion[EXTERN_PLAYER] = 1;
+						}
+					}
+					
+					if (C_bombs[LOCAL_PLAYER] == BOMB_EXPLODE) { //4seconden
+						C_bombs[LOCAL_PLAYER] = 0;
+						F_bombExplosion[LOCAL_PLAYER] = 0;
+						localCharacter.bomb.explodeBomb(&F_playerDeath);
+						locDeleteBomb = true;
+					}
+					if (C_bombs[EXTERN_PLAYER] == BOMB_EXPLODE) {
+						C_bombs[EXTERN_PLAYER] = 0;
+						F_bombExplosion[EXTERN_PLAYER] = 0;
+						externCharacter.bomb.explodeBomb(&F_playerDeath);
+						extDeleteBomb = true;
+					}
+
+					if(F_playerDeath){
+						F_playerDeath = 0;
+						ir.send(IDENTIFIER_PLAYER_DEAD, 0, BITLENGTH_PLAYER_DEAD);
+						ir.enableReceiver();
+					}
+				break;
+			}
 		}
 	}
 
