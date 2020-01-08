@@ -43,8 +43,6 @@ volatile Waitingpage waitingpage;		// maak waitingpage object aan
 volatile uint8_t PE_data = 0b00000000;	// data die naar PE word gestuurd
 uint8_t identifierStartReceived = 0;
 
-//Singleton design pattern
-//https://stackoverflow.com/questions/1008019/c-singleton-design-pattern
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 NunchukInput* nunchuk = NunchukInput::getInstance();
 Character localCharacter;
