@@ -24,7 +24,7 @@ void Bomb::explodeBomb(uint8_t *flag) {
 			localCharacter.health--;
 			*flag = 1;
 		} else if(type == TYPE_EXTERNPLAYER) {
-			externCharacter.health--;
+			//externCharacter.health--;
 		}
 	}
 
